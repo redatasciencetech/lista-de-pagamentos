@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Boletos com Copiar</title>
+<style>
+  body {
+    font-family: Arial, sans-serif;
+    background: #f8f8f8;
+    padding: 20px;
+  }
+
+  .linha-boleto {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    background: #fff;
+    border: 1px solid #ddd;
+    padding: 10px 12px;
+    margin-bottom: 10px;
+    border-radius: 8px;
+    gap: 12px; /* espaço entre os itens */
+  }
+
+  .nome-boleto {
+    min-width: 120px;         /* largura mínima para o nome */
+    font-weight: bold;
+    color: #333;
+  }
+
+  .codigo-boleto {
+    flex: 1;                  /* ocupa o espaço restante */
+    font-size: 14px;
+    word-break: break-all;     /* quebra caso o código seja grande */
+    color: #555;
+  }
+
+  .copy-btn {
+    background: #007bff;
+    border: none;
+    color: #fff;
+    padding: 6px 12px;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 14px;
+    transition: background 0.2s;
+  }
+  .copy-btn:hover {
+    background: #0056b3;
+  }
+
+  /* Toast (aviso flutuante) */
+  #toast {
+    visibility: hidden;
+    min-width: 200px;
+    background: #333;
+    color: #fff;
+    text-align: center;
+    border-radius: 6px;
+    padding: 10px 16px;
+    position: fixed;
+    bottom: 30px;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 9999;
+    opacity: 0;
+    transition: opacity 0.4s, visibility 0.4s;
+  }
+  #toast.show {
+    visibility: visible;
+    opacity: 1;
+  }
+
+</style>
+</head>
+<body>
+
+<h1>Lista de Pagamentos</h1>
+
+<div class="linha-boleto">
+  <span class="nome-boleto">COSANPA VILA - JULHO - R$ 49,08</span>
+  <span class="codigo-boleto">00190.00009 03469.663110 31074.781175 2 11730000004908</span>
+  <button class="copy-btn">Copiar</button>
+</div>
+
+<div class="linha-boleto">
+  <span class="nome-boleto">COSANPA VILA - AGOSTO - R$ 49,08</span>
+  <span class="codigo-boleto">00190.00009 03469.663110 31737.220173 6 12050000004908</span>
+  <button class="copy-btn">Copiar</button>
+</div>
+
+<div class="linha-boleto">
+  <span class="nome-boleto">ENERGIA KITNET E - R$ 490,30</span>
+  <span class="codigo-boleto">00020126990014br.gov.bcb.pix01366a36f461-044b-4292-9090-a5a6d6954c080237Venc: 27.08.2025 - R$          490,305204000053039865406490.305802BR5915Equatorial Para6005Belem62270523BOLETO3373384197065892363044217</span>
+  <button class="copy-btn">Copiar</button>
+</div>
+
+<script>
+  // Seleciona todos os botões e adiciona a função de copiar
+  document.querySelectorAll('.copy-btn').forEach(function(button) {
+    button.addEventListener('click', function() {
+      const codigo = this.parentElement.querySelector('.codigo-boleto').textContent;
+      const nome   = this.parentElement.querySelector('.nome-boleto').textContent;
+      navigator.clipboard.writeText(codigo).then(() => {
+        alert(`Código do boleto "${nome}" copiado:\n${codigo}`);
+      });
+    });
+  });
+</script>
+
+</body>
+</html>
