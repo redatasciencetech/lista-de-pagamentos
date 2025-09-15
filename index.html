@@ -32,7 +32,10 @@
   .codigo-boleto {
     flex: 1;                  /* ocupa o espaço restante */
     font-size: 14px;
-    word-break: break-all;     /* quebra caso o código seja grande */
+    overflow: hidden;     /* não deixa quebrar em várias linhas */
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    margin-right: 8px;
     color: #555;
   }
 
