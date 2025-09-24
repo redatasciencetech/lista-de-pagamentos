@@ -1,17 +1,68 @@
+/* Container de cada item */
+.item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 10px 12px;
+  background: var(--card);
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  margin-bottom: 10px;
+}
+
+/* Área de informações (descrição + código) */
 .info {
   display: flex;
   gap: 12px;
   align-items: center;
   flex: 1;
-  min-width: 0; /* 👈 evita que o flex force largura infinita */
+  min-width: 0; /* 👈 ESSENCIAL para permitir o ellipsis funcionar no flex */
 }
 
+/* Descrição do pagamento */
 .descricao {
   font-weight: 600;
   color: #222;
-  flex: 1;             /* 👈 ocupa todo espaço possível */
-  min-width: 0;        /* 👈 permite encolher dentro do flex */
-  white-space: nowrap; /* 👈 não quebra linha */
-  overflow: hidden;    /* 👈 esconde excesso */
-  text-overflow: ellipsis; /* 👈 mostra "..." */
+  flex: 1;
+  min-width: 0; /* 👈 impede o texto de empurrar os botões */
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis; /* Mostra "..." quando o texto for longo */
+}
+
+/* Código (PIX / barras) */
+.codigo {
+  font-family: monospace;
+  font-size: 0.95rem;
+  color: #444;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 40%;
+}
+
+/* Botões */
+.acoes {
+  display: flex;
+  gap: 8px;
+  flex-shrink: 0; /* 👈 garante que os botões nunca encolham */
+}
+
+.btn {
+  border: 0;
+  padding: 6px 10px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 14px;
+}
+.copy-btn { background: var(--primary); color: #fff; }
+.remove-btn { background: var(--danger); color: #fff; }
+.copy-btn:hover, .remove-btn:hover { filter: brightness(.95); }
+
+/* Responsivo */
+@media (max-width: 600px) {
+  .codigo { max-width: 35%; }
+  .info { flex-direction: column; align-items: flex-start; gap: 6px; }
+  .acoes { width: 100%; justify-content: flex-end; }
 }
