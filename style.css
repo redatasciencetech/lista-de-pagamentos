@@ -1,0 +1,17 @@
+.info {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+  flex: 1;
+  min-width: 0; /* 👈 evita que o flex force largura infinita */
+}
+
+.descricao {
+  font-weight: 600;
+  color: #222;
+  flex: 1;             /* 👈 ocupa todo espaço possível */
+  min-width: 0;        /* 👈 permite encolher dentro do flex */
+  white-space: nowrap; /* 👈 não quebra linha */
+  overflow: hidden;    /* 👈 esconde excesso */
+  text-overflow: ellipsis; /* 👈 mostra "..." */
+}

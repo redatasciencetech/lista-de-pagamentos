@@ -38,8 +38,15 @@
     gap:12px; padding:10px 12px; background:var(--card); border:1px solid #ddd;
     border-radius:8px; margin-bottom:10px;
   }
-  .info{ display:flex; gap:12px; align-items:center; flex:1; min-width:0; }
-  .descricao{ font-weight:600; color:#222; min-width:0; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;}
+  .info{
+    display:flex; gap:12px; align-items:center;
+    flex:1; min-width:0; /* 👈 importante para ellipsis funcionar */
+  }
+  .descricao{
+    font-weight:600; color:#222;
+    flex:1; min-width:0; /* 👈 impede de empurrar os botões */
+    white-space:nowrap; overflow:hidden; text-overflow:ellipsis;
+  }
   .codigo{
     font-family:monospace; font-size:0.95rem; color:#444;
     white-space:nowrap; overflow:hidden; text-overflow:ellipsis; max-width:40%;
@@ -86,10 +93,7 @@
 
 <script>
 /* ==================== CONFIGURAÇÃO ==================== */
-/* Troque a senha aqui conforme desejar */
 const SENHA = "7025";
-
-/* Chave do localStorage */
 const LS_KEY = "meus_pagamentos_v1";
 
 /* Elementos */
@@ -100,11 +104,8 @@ const codigoInput = document.getElementById('codigo');
 
 /* ==================== UTIL ==================== */
 function salvar(dados){
-  try{
-    localStorage.setItem(LS_KEY, JSON.stringify(dados));
-  }catch(e){
-    console.error("Erro ao salvar localStorage", e);
-  }
+  try{ localStorage.setItem(LS_KEY, JSON.stringify(dados)); }
+  catch(e){ console.error("Erro ao salvar localStorage", e); }
 }
 function carregar(){
   try{
@@ -117,7 +118,7 @@ function carregar(){
   }
 }
 
-/* ==================== INICIALIZAÇÃO (dados padrão se vazio) ==================== */
+/* ==================== INICIALIZAÇÃO ==================== */
 let pagamentos = carregar();
 if(!pagamentos){
   pagamentos = [
@@ -143,7 +144,7 @@ function criarItemElement(item){
   const codigo = document.createElement('div');
   codigo.className = 'codigo';
   codigo.textContent = item.codigo;
-  codigo.title = item.codigo; // mostra código completo no hover
+  codigo.title = item.codigo;
 
   info.appendChild(descricao);
   info.appendChild(codigo);
@@ -156,7 +157,6 @@ function criarItemElement(item){
   copyBtn.className = 'btn copy-btn';
   copyBtn.textContent = 'Copiar';
   copyBtn.setAttribute('aria-label', 'Copiar código');
-  // evento copiar
   copyBtn.addEventListener('click', async () => {
     await copyToClipboard(item.codigo, copyBtn);
   });
@@ -169,12 +169,11 @@ function criarItemElement(item){
 
   removeBtn.addEventListener('click', () => {
     const tentativa = prompt("Digite a senha para remover:");
-    if(tentativa === null) return; // cancelou
+    if(tentativa === null) return;
     if(tentativa !== SENHA){
       alert("Senha incorreta!");
       return;
     }
-    // remover do array e salvar
     pagamentos = pagamentos.filter(p => String(p.id) !== String(item.id));
     salvar(pagamentos);
     renderLista();
@@ -203,14 +202,12 @@ function renderLista(){
   });
 }
 
-/* ==================== COPIAR: função com fallback ==================== */
+/* ==================== COPIAR ==================== */
 async function copyToClipboard(text, btn){
-  // tenta Clipboard API
   try{
     if(navigator.clipboard && navigator.clipboard.writeText){
       await navigator.clipboard.writeText(text);
     } else {
-      // fallback usando textarea
       const ta = document.createElement('textarea');
       ta.value = text;
       ta.style.position = 'fixed';
@@ -220,7 +217,6 @@ async function copyToClipboard(text, btn){
       document.execCommand('copy');
       document.body.removeChild(ta);
     }
-    // feedback visual no botão
     const original = btn.textContent;
     btn.textContent = 'Copiado!';
     btn.disabled = true;
@@ -231,11 +227,11 @@ async function copyToClipboard(text, btn){
   }
 }
 
-/* ==================== FORM: adicionar com senha ==================== */
+/* ==================== FORM ==================== */
 form.addEventListener('submit', (ev) => {
   ev.preventDefault();
   const tentativa = prompt("Digite a senha para adicionar:");
-  if(tentativa === null) return; // cancelou
+  if(tentativa === null) return;
   if(tentativa !== SENHA){
     alert("Senha incorreta!");
     return;
@@ -249,7 +245,7 @@ form.addEventListener('submit', (ev) => {
   }
 
   const novo = { id: Date.now() + Math.floor(Math.random()*999), descricao, codigo };
-  pagamentos.unshift(novo); // adiciona no topo
+  pagamentos.unshift(novo);
   salvar(pagamentos);
   renderLista();
   form.reset();
@@ -266,4 +262,5 @@ renderLista();
 </footer>
 </body>
 </html>
+
 
