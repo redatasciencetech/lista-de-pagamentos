@@ -1,287 +1,269 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Códigos de Pagamentos</title>
-
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>Códigos de Pagamento MARG</title>
 <style>
-
-h2 {
-    color: blueviolet;
+  :root{
+    --bg:#f8f9fa; --card:#fff; --muted:#6c757d; --primary:#0d6efd; --danger:#dc3545; --success:#198754;
   }
-
-  h4 {
-    color: red;
+  body{
+    font-family: Inter, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;
+    margin:0; padding:20px; background:var(--bg); color:#222;
   }
+  img.header{width:100%; height:auto; border-radius:6px; margin-bottom:16px; object-fit:cover}
 
-  body {
-    font-family: 'Times New Roman', Times, serif;
-    background: #f8f8f8f8;
-    padding: 20px;
+  h4{ color:#c52323; margin:1rem 0; }
+
+  /* Form */
+  #form-adicionar{
+    display:flex; gap:8px; flex-wrap:wrap;
+    background:var(--card); border:1px solid #ddd; padding:12px; border-radius:8px;
   }
-
-    .linha-boleto {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    background: #fff;
-    border: 1px solid #ddd;
-    padding: 10px 12px;
-    margin-bottom: 10px;
-    border-radius: 8px;
-    gap: 12px; /* espaço entre os itens */
+  #form-adicionar input{
+    flex:1; padding:8px 10px; border-radius:6px; border:1px solid #ccc;
+    min-width:150px;
   }
-
-  .nome-boleto {
-    min-width: 120px;         /* largura mínima para o nome */
-    font-weight: bold;
-    color: #333;
+  #form-adicionar button{
+    padding:8px 12px; border-radius:6px; border:0; cursor:pointer;
+    background:var(--success); color:#fff;
   }
+  #form-adicionar button:hover{ filter:brightness(.95) }
 
-  .codigo-boleto {
-    flex: 1;                  /* ocupa o espaço restante */
-    font-size: 14px;
-    overflow: hidden;     /* não deixa quebrar em várias linhas */
-    white-space: nowrap;
-    text-overflow: ellipsis;
-    margin-right: 8px;
-    color: #555;
+  /* Lista */
+  #lista-pagamentos{ margin-top:14px; }
+  .item{
+    display:flex; align-items:center; justify-content:space-between;
+    gap:12px; padding:10px 12px; background:var(--card); border:1px solid #ddd;
+    border-radius:8px; margin-bottom:10px;
+  }
+  .info{ display:flex; gap:12px; align-items:center; flex:1; min-width:0; }
+  .descricao{ font-weight:600; color:#222; min-width:0; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;}
+  .codigo{
+    font-family:monospace; font-size:0.95rem; color:#444;
+    white-space:nowrap; overflow:hidden; text-overflow:ellipsis; max-width:40%;
   }
 
-  .copy-btn {
-    background: #007bff;
-    border: none;
-    color: #fff;
-    padding: 6px 12px;
-    border-radius: 6px;
-    cursor: pointer;
-    font-size: 14px;
-    transition: background 0.2s;
+  .acoes{ display:flex; gap:8px; flex-shrink:0; }
+  .btn{
+    border:0; padding:6px 10px; border-radius:6px; cursor:pointer; font-size:14px;
   }
-  .copy-btn:hover {
-    background: #0056b3;
-  }
+  .copy-btn{ background:var(--primary); color:#fff; }
+  .copy-btn:hover{ filter:brightness(.95) }
+  .remove-btn{ background:var(--danger); color:#fff; }
+  .remove-btn:hover{ filter:brightness(.95) }
 
-  /* Toast (aviso flutuante) */
-  #toast {
-    visibility: hidden;
-    min-width: 200px;
-    background: #333;
-    color: #fff;
-    text-align: center;
-    border-radius: 6px;
-    padding: 10px 16px;
-    position: fixed;
-    bottom: 30px;
-    left: 50%;
-    transform: translateX(-50%);
-    z-index: 9999;
-    opacity: 0;
-    transition: opacity 0.4s, visibility 0.4s;
-  }
-  #toast.show {
-    visibility: visible;
-    opacity: 1;
-  }
+  .small{ font-size:0.85rem; color:var(--muted); margin-top:8px; }
 
+  footer{
+    margin-top:20px; border-top:1px solid #ddd; padding-top:12px; display:flex; gap:10px; align-items:center; justify-content:center;
+    color:var(--muted); font-size:0.95rem;
+  }
+  @media (max-width:600px){
+    .codigo{ max-width:35% }
+    #form-adicionar{ flex-direction:column; }
+    #form-adicionar button{ width:100% }
+    .info{ flex-direction:column; align-items:flex-start; gap:6px }
+    .acoes{ width:100%; justify-content:flex-end }
+  }
 </style>
 </head>
 <body>
 
-<img src="cabecalho.png"
-     alt="Logo Cabeçalho.png"
-     style="width: 100%; height: auto;"
- >
+<img src="cabecalho.png" alt="Cabeçalho" class="header">
 
+<h4>Adicionar Novo Pagamento</h4>
+<form id="form-adicionar" autocomplete="off">
+  <input id="descricao" type="text" placeholder="Descrição (ex: BOLETO ou PIX - ITEM_VALOR_VENCIMENTO)" required />
+  <input id="codigo" type="text" placeholder="Código de BARRAS ou chave PIX (cole aqui)" required />
+  <button type="submit">Adicionar</button>
+</form>
+<div class="small">Ao adicionar ou remover será solicitada a senha. O botão "Copiar" copia apenas o código (BARRAS/PIX).</div>
 
-        <!-- Google Fonts: Inter -->
-        <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
-        <style>
-            body {
-                font-family: 'Inter', sans-serif;
-                color: #333;
-                background: #f8f9fa;
-                margin: 0;
-                padding: 0;
-            }
-            header {
-                background: linear-gradient(90deg, #0d6efd 0%, #6c757d 100%);
-                color: #fff;
-                padding: 1.5rem 0 1rem 0;
-                text-align: center;
-                box-shadow: 0 2px 8px rgba(0,0,0,0.04);
-            }
-            header img {
-                max-width: 80px;
-                margin-bottom: 0.5rem;
-            }
-            h1 {
-                font-size: 2rem;
-                font-weight: 700;
-                margin: 0.5rem 0 0 0;
-                color: #fff;
-            }
-            h2 {
-                font-size: 1.2rem;
-                font-weight: 600;
-                color: #222;
-                margin-top: 2rem;
-                text-align: center;
-            }
-            .container {
-                max-width: 800px;
-                margin: 0 auto;
-                padding: 1rem;
-            }
-            .card {
-                background: #fff;
-                border-radius: 12px;
-                padding: 1rem;
-                margin-bottom: 1rem;
-                box-shadow: 0 2px 6px rgba(0,0,0,0.08);
-                display: flex;
-                justify-content: space-between;
-                align-items: center;
-                transition: transform .2s, box-shadow .2s;
-            }
-            .card:hover {
-                transform: translateY(-2px);
-                box-shadow: 0 4px 12px rgba(0,0,0,0.12);
-            }
-            .card span {
-                font-weight: 600;
-                color: #222;
-            }
-            .card button {
-                background: #0d6efd;
-                color: #fff;
-                border: none;
-                border-radius: 8px;
-                padding: 0.5rem 1rem;
-                cursor: pointer;
-                font-size: 1rem;
-                transition: background .3s;
-                display: flex;
-                align-items: center;
-                gap: 0.5rem;
-            }
-            .card button:hover {
-                background: #0b5ed7;
-            }
-            footer {
-                text-align: center;
-                color: #6c757d;
-                font-size: 0.95rem;
-                padding: 1.5rem 0 1rem 0;
-                background: none;
-                margin-top: 2rem;
-            }
-            @media (max-width: 600px) {
-                .container {
-                    padding: 0.5rem;
-                }
-                .card {
-                    flex-direction: column;
-                    align-items: flex-start;
-                    gap: 0.5rem;
-                }
-                h1 {
-                    font-size: 1.3rem;
-                }
-                h2 {
-                    font-size: 1rem;
-                }
-            }
-        </style>
-
-<h4>Códigos de Barras</h4>
-
-<div class="linha-boleto">
-  <span class="nome-boleto">CASA BAHIA (GELADEIRA) 11/15 - R$ 349,19_VENC. 15/09</span>
-  <span class="codigo-boleto">00190.00009 03546.281001 53292.866174 6 11730000034919</span>
-  <button class="copy-btn">Copiar</button>
-</div>
-
-<div class="linha-boleto">
-  <span class="nome-boleto">SISTEMA SENSEBOARD - R$ 597,00_VENC. 28/09</span>
-  <span class="codigo-boleto">40192025244600000000300001280866912180000059700</span>
-  <button class="copy-btn">Copiar</button>
-</div>
-
-
-
-<h4>PIX Copia e Cola</h4>
-<div class="linha-boleto">
-  <span class="nome-boleto"> INTERNET OI - R$ 167,96_VENC. 22/09</span>
-  <span class="codigo-boleto">00020126700014br.gov.bcb.pix0136d8c9d705-a4b9-4963-8ddf-8fbc8548c6510208CLIENTCO52040000530398654130000000167.965802BR5908CLIENTCO6014RIO DE JANEIRO6229052520123471990612511943002006304D5E3</span>
-  <button class="copy-btn">Copiar</button>
-</div>
-  
-
-<img src="serena.png" alt="serena.png" style="width: 100%; height: auto;">
-<h4>PIX Copia e Cola</h4>
-
-<div class="linha-boleto">
-  <span class="nome-boleto">MÁRCIA - FEVEREIRO - R$ 1.197,55</span>
-  <span class="codigo-boleto">00020101021226770014BR.GOV.BCB.PIX2555api.itau/pix/qr/v2/49f8e9f6-a667-490e-8ecd-0768f4587ac95204000053039865802BR5921CONSORCIO OMEGA GD 126005BELEM62070503***6304F79D</span>
-  <button class="copy-btn">Copiar</button>
-</div>
-
-<div class="linha-boleto">
-  <span class="nome-boleto">LOJA - JUNHO - R$ 2.204,20</span>
-  <span class="codigo-boleto">00020101021226770014BR.GOV.BCB.PIX2555api.itau/pix/qr/v2/824f1dac-2b79-4373-a141-d5a35ce160685204000053039865802BR5921CONSORCIO OMEGA GD 126005BELEM62070503***63043402
-</span>
-  <button class="copy-btn">Copiar</button>
-</div>
-
-<div class="linha-boleto">
-  <span class="nome-boleto">LOJA - JULHO - R$ 2.135,86</span>
-  <span class="codigo-boleto">00020101021226770014BR.GOV.BCB.PIX2555api.itau/pix/qr/v2/14413ac1-23d3-4550-b30a-2fe7ad3e9a885204000053039865802BR5921CONSORCIO OMEGA GD 126005BELEM62070503***630483A5
-</span>
-  <button class="copy-btn">Copiar</button>
-</div>
-
-<div class="linha-boleto">
-  <span class="nome-boleto">LOJA - AGOSTO - R$ 2.302,23</span>
-  <span class="codigo-boleto">00020101021226770014BR.GOV.BCB.PIX2555api.itau/pix/qr/v2/dd2ede7b-ed04-4ec0-a291-dd60ad82554f5204000053039865802BR5921CONSORCIO OMEGA GD 126005BELEM62070503***6304D8CF
-</span>
-  <button class="copy-btn">Copiar</button>
-</div>
-
-
+<h4>Códigos de Pagamento</h4>
+<div id="lista-pagamentos" aria-live="polite"></div>
 
 <script>
-  // Seleciona todos os botões e adiciona a função de copiar
-  document.querySelectorAll('.copy-btn').forEach(function(button) {
-    button.addEventListener('click', function() {
-      const codigo = this.parentElement.querySelector('.codigo-boleto').textContent;
-      const nome   = this.parentElement.querySelector('.nome-boleto').textContent;
-      navigator.clipboard.writeText(codigo).then(() => {
-        alert(`Código do boleto "${nome}" copiado:\n${codigo}`);
-      });
-    });
+/* ==================== CONFIGURAÇÃO ==================== */
+/* Troque a senha aqui conforme desejar */
+const SENHA = "1596";
+
+/* Chave do localStorage */
+const LS_KEY = "meus_pagamentos_v1";
+
+/* Elementos */
+const listaEl = document.getElementById('lista-pagamentos');
+const form = document.getElementById('form-adicionar');
+const descInput = document.getElementById('descricao');
+const codigoInput = document.getElementById('codigo');
+
+/* ==================== UTIL ==================== */
+function salvar(dados){
+  try{
+    localStorage.setItem(LS_KEY, JSON.stringify(dados));
+  }catch(e){
+    console.error("Erro ao salvar localStorage", e);
+  }
+}
+function carregar(){
+  try{
+    const raw = localStorage.getItem(LS_KEY);
+    if(!raw) return null;
+    return JSON.parse(raw);
+  }catch(e){
+    console.error("Erro ao ler localStorage", e);
+    return null;
+  }
+}
+
+/* ==================== INICIALIZAÇÃO (dados padrão se vazio) ==================== */
+let pagamentos = carregar();
+if(!pagamentos){
+  pagamentos = [
+    { id: Date.now()+1, descricao: "CASA BAHIA (GELADEIRA) – R$ 349,19", codigo: "34191 349189 000000 000000 000000 0" },
+    { id: Date.now()+2, descricao: "SISTEMA SENSEBOARD – R$ 597,00", codigo: "00020101021226870014BR.GOV.BCB.PIX0121..." }
+  ];
+  salvar(pagamentos);
+}
+
+/* ==================== RENDER ==================== */
+function criarItemElement(item){
+  const wrap = document.createElement('div');
+  wrap.className = 'item';
+  wrap.dataset.id = item.id;
+
+  const info = document.createElement('div');
+  info.className = 'info';
+
+  const descricao = document.createElement('div');
+  descricao.className = 'descricao';
+  descricao.textContent = item.descricao;
+
+  const codigo = document.createElement('div');
+  codigo.className = 'codigo';
+  codigo.textContent = item.codigo;
+  codigo.title = item.codigo; // mostra código completo no hover
+
+  info.appendChild(descricao);
+  info.appendChild(codigo);
+
+  const acoes = document.createElement('div');
+  acoes.className = 'acoes';
+
+  const copyBtn = document.createElement('button');
+  copyBtn.type = 'button';
+  copyBtn.className = 'btn copy-btn';
+  copyBtn.textContent = 'Copiar';
+  copyBtn.setAttribute('aria-label', 'Copiar código');
+  // evento copiar
+  copyBtn.addEventListener('click', async () => {
+    await copyToClipboard(item.codigo, copyBtn);
   });
+
+  const removeBtn = document.createElement('button');
+  removeBtn.type = 'button';
+  removeBtn.className = 'btn remove-btn';
+  removeBtn.textContent = 'Remover';
+  removeBtn.setAttribute('aria-label', 'Remover item');
+
+  removeBtn.addEventListener('click', () => {
+    const tentativa = prompt("Digite a senha para remover:");
+    if(tentativa === null) return; // cancelou
+    if(tentativa !== SENHA){
+      alert("Senha incorreta!");
+      return;
+    }
+    // remover do array e salvar
+    pagamentos = pagamentos.filter(p => String(p.id) !== String(item.id));
+    salvar(pagamentos);
+    renderLista();
+  });
+
+  acoes.appendChild(copyBtn);
+  acoes.appendChild(removeBtn);
+
+  wrap.appendChild(info);
+  wrap.appendChild(acoes);
+
+  return wrap;
+}
+
+function renderLista(){
+  listaEl.innerHTML = '';
+  if(!pagamentos || pagamentos.length === 0){
+    const vazio = document.createElement('div');
+    vazio.textContent = "Nenhum pagamento adicionado.";
+    vazio.style.color = "var(--muted)";
+    listaEl.appendChild(vazio);
+    return;
+  }
+  pagamentos.forEach(item => {
+    listaEl.appendChild(criarItemElement(item));
+  });
+}
+
+/* ==================== COPIAR: função com fallback ==================== */
+async function copyToClipboard(text, btn){
+  // tenta Clipboard API
+  try{
+    if(navigator.clipboard && navigator.clipboard.writeText){
+      await navigator.clipboard.writeText(text);
+    } else {
+      // fallback usando textarea
+      const ta = document.createElement('textarea');
+      ta.value = text;
+      ta.style.position = 'fixed';
+      ta.style.left = '-9999px';
+      document.body.appendChild(ta);
+      ta.select();
+      document.execCommand('copy');
+      document.body.removeChild(ta);
+    }
+    // feedback visual no botão
+    const original = btn.textContent;
+    btn.textContent = 'Copiado!';
+    btn.disabled = true;
+    setTimeout(() => { btn.textContent = original; btn.disabled = false; }, 1300);
+  }catch(err){
+    console.error("Erro ao copiar:", err);
+    alert("Não foi possível copiar. Selecionar manualmente.");
+  }
+}
+
+/* ==================== FORM: adicionar com senha ==================== */
+form.addEventListener('submit', (ev) => {
+  ev.preventDefault();
+  const tentativa = prompt("Digite a senha para adicionar:");
+  if(tentativa === null) return; // cancelou
+  if(tentativa !== SENHA){
+    alert("Senha incorreta!");
+    return;
+  }
+
+  const descricao = descInput.value.trim();
+  const codigo = codigoInput.value.trim();
+  if(!descricao || !codigo){
+    alert("Preencha descrição e código.");
+    return;
+  }
+
+  const novo = { id: Date.now() + Math.floor(Math.random()*999), descricao, codigo };
+  pagamentos.unshift(novo); // adiciona no topo
+  salvar(pagamentos);
+  renderLista();
+  form.reset();
+  descInput.focus();
+});
+
+/* ==================== inicial render ==================== */
+renderLista();
 </script>
 
-<!-- Exemplo de rodapé -->
-<footer style="
-  position: relative; 
-  width: 100%; 
-  display: flex; 
-  justify-content: center; 
-  align-items: center; 
-  gap: 8px; 
-  padding: 10px; 
-  background-color: #f8f9fa; 
-  border-top: 1px solid #ddd;
-">
-  <img src="minha-logo.png" alt="Logo da minha empresa" width="30" height="30">
-    <span>© 2025 Rogério Estumano</span>
+<footer>
+  <img src="minha-logo.png" alt="Logo" style="height:28px;">
+  <span>© 2025 Rogério Estumano</span>
 </footer>
-
-
-
-
 </body>
 </html>
+
