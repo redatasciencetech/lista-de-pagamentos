@@ -30,22 +30,18 @@
       margin-bottom: 10px;
       border-radius: 8px;
       gap: 12px;
-      /* espaço entre os itens */
     }
 
     .nome-boleto {
       min-width: 120px;
-      /* largura mínima para o nome */
       font-weight: bold;
       color: #333;
     }
 
     .codigo-boleto {
       flex: 1;
-      /* ocupa o espaço restante */
       font-size: 14px;
       overflow: hidden;
-      /* não deixa quebrar em várias linhas */
       white-space: nowrap;
       text-overflow: ellipsis;
       margin-right: 8px;
@@ -67,176 +63,144 @@
       background: #0056b3;
     }
 
-    /* Toast (aviso flutuante) */
-    #toast {
-      visibility: hidden;
-      min-width: 200px;
-      background: #333;
-      color: #fff;
-      text-align: center;
-      border-radius: 6px;
-      padding: 10px 16px;
-      position: fixed;
-      bottom: 30px;
-      left: 50%;
-      transform: translateX(-50%);
-      z-index: 9999;
-      opacity: 0;
-      transition: opacity 0.4s, visibility 0.4s;
-    }
-
-    #toast.show {
-      visibility: visible;
-      opacity: 1;
+    /* Quando copiado */
+    .copy-btn.copiado {
+      background: #28a745 !important; /* verde */
     }
   </style>
 </head>
 
-<body> <img src="cabecalho.png" alt="Logo Cabeçalho.png" style="width: 100%; height: auto;">
-  <h4>Códigos de Barras</h4> <!-- Google Fonts: Inter -->
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
-  <style>
-    body {
-      font-family: 'Inter', sans-serif;
-      color: #333;
-      background: #f8f9fa;
-      margin: 0;
-      padding: 0;
-    }
+<body>
+  <img src="cabecalho.png" alt="Logo Cabeçalho.png" style="width: 100%; height: auto;">
+  
 
-    header {
-      background: linear-gradient(90deg, #0d6efd 0%, #6c757d 100%);
-      color: #fff;
-      padding: 1.5rem 0 1rem 0;
-      text-align: center;
-      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
-    }
 
-    header img {
-      max-width: 80px;
-      margin-bottom: 0.5rem;
-    }
+<!-- Caixa de pergunta com botão de limpar -->
+<div class="pergunta-container">
+  <input type="text" id="perguntaInput" placeholder="Teste sua cópia aqui!" class="pergunta-input">
+  <button class="clear-btn" onclick="document.getElementById('perguntaInput').value=''">Apagar Texto</button>
+</div>
 
-    h1 {
-      font-size: 2rem;
-      font-weight: 700;
-      margin: 0.5rem 0 0 0;
-      color: #fff;
-    }
+<style>
+  .pergunta-container {
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    margin: 20px 0;
+    position: relative;
+  }
 
-    h2 {
-      font-size: 1.2rem;
-      font-weight: 600;
-      color: #222;
-      margin-top: 2rem;
-      text-align: center;
-    }
+  .pergunta-input {
+    width: 90%;
+    max-width: 600px;
+    padding: 12px 40px 12px 16px; /* espaço para o botão */
+    border: 1px solid #000;
+    border-radius: 8px;
+    font-size: 16px;
+    outline: none;
+    transition: border-color 0.3s, box-shadow 0.3s;
+  }
 
-    .container {
-      max-width: 800px;
-      margin: 0 auto;
-      padding: 1rem;
-    }
+  .pergunta-input:focus {
+    border-color: #0d6efd;
+    box-shadow: 0 0 6px rgba(13, 110, 253, 0.5);
+  }
 
-    .card {
-      background: #fff;
-      border-radius: 12px;
-      padding: 1rem;
-      margin-bottom: 1rem;
-      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08);
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      transition: transform .2s, box-shadow .2s;
-    }
+  .clear-btn {
+    position: absolute;
+    right: 20px;
+    top: 50%;
+    transform: translateY(-50%);
+    background: none;
+    border: none;
+    font-size: 16px;
+    color: #555;
+    cursor: pointer;
+    display: none; /* começa escondido */
+  }
 
-    .card:hover {
-      transform: translateY(-2px);
-      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12);
-    }
+  .clear-btn:hover {
+    color: #000;
+  }
+</style>
 
-    .card span {
-      font-weight: 600;
-      color: #222;
-    }
+<script>
+  const input = document.getElementById("perguntaInput");
+  const clearBtn = document.querySelector(".clear-btn");
 
-    .card button {
-      background: #0d6efd;
-      color: #fff;
-      border: none;
-      border-radius: 8px;
-      padding: 0.5rem 1rem;
-      cursor: pointer;
-      font-size: 1rem;
-      transition: background .3s;
-      display: flex;
-      align-items: center;
-      gap: 0.5rem;
-    }
+  // Mostrar o botão apenas quando houver texto
+  input.addEventListener("input", () => {
+    clearBtn.style.display = input.value ? "block" : "none";
+  });
+</script>
 
-    .card button:hover {
-      background: #0b5ed7;
-    }
+  
+  <h4>Códigos de Barras</h4>
 
-    footer {
-      text-align: center;
-      color: #6c757d;
-      font-size: 0.95rem;
-      padding: 1.5rem 0 1rem 0;
-      background: none;
-      margin-top: 2rem;
-    }
+  <div class="linha-boleto">
+    <span class="nome-boleto">SISTEMA SENSEBOARD R$ 597 - Venc:28/09</span>
+    <span class="codigo-boleto">40192025244600000000300001280866912180000059700</span>
+    <button class="copy-btn">Copiar</button>
+  </div>
 
-    @media (max-width: 600px) {
-      .container {
-        padding: 0.5rem;
-      }
-
-      .card {
-        flex-direction: column;
-        align-items: flex-start;
-        gap: 0.5rem;
-      }
-
-      h1 {
-        font-size: 1.3rem;
-      }
-
-      h2 {
-        font-size: 1rem;
-      }
-    }
-  </style>
-  <div class="linha-boleto"> <span class="nome-boleto">SISTEMA SENSEBOARD R$ 597 - Venc:28/09</span> <span
-      class="codigo-boleto">40192025244600000000300001280866912180000059700</span> <button
-      class="copy-btn">Copiar</button> </div>
-  <h4>PIX Copia e Cola</h4> <img src="serena.png" alt="serena.png" style="width: 100%; height: auto;">
   <h4>PIX Copia e Cola</h4>
-  <div class="linha-boleto"> <span class="nome-boleto">MÁRCIA - FEVEREIRO - R$ 1.197,55</span> <span
-      class="codigo-boleto">00020101021226770014BR.GOV.BCB.PIX2555api.itau/pix/qr/v2/49f8e9f6-a667-490e-8ecd-0768f4587ac95204000053039865802BR5921CONSORCIO
-      OMEGA GD 126005BELEM62070503***6304F79D</span> <button class="copy-btn">Copiar</button> </div>
-  <div class="linha-boleto"> <span class="nome-boleto">LOJA - JUNHO - R$ 2.204,20</span> <span
-      class="codigo-boleto">00020101021226770014BR.GOV.BCB.PIX2555api.itau/pix/qr/v2/824f1dac-2b79-4373-a141-d5a35ce160685204000053039865802BR5921CONSORCIO
-      OMEGA GD 126005BELEM62070503***63043402 </span> <button class="copy-btn">Copiar</button> </div>
-  <div class="linha-boleto"> <span class="nome-boleto">LOJA - JULHO - R$ 2.135,86</span> <span
-      class="codigo-boleto">00020101021226770014BR.GOV.BCB.PIX2555api.itau/pix/qr/v2/14413ac1-23d3-4550-b30a-2fe7ad3e9a885204000053039865802BR5921CONSORCIO
-      OMEGA GD 126005BELEM62070503***630483A5 </span> <button class="copy-btn">Copiar</button> </div>
-  <div class="linha-boleto"> <span class="nome-boleto">LOJA - AGOSTO - R$ 2.302,23</span> <span
-      class="codigo-boleto">00020101021226770014BR.GOV.BCB.PIX2555api.itau/pix/qr/v2/dd2ede7b-ed04-4ec0-a291-dd60ad82554f5204000053039865802BR5921CONSORCIO
-      OMEGA GD 126005BELEM62070503***6304D8CF </span> <button class="copy-btn">Copiar</button> </div>
-  <script> // Seleciona todos os botões e adiciona a função de copiar document.querySelectorAll('.copy-btn').forEach(function(button) { button.addEventListener('click', function() { const codigo = this.parentElement.querySelector('.codigo-boleto').textContent; const nome = this.parentElement.querySelector('.nome-boleto').textContent; navigator.clipboard.writeText(codigo).then(() => { alert(Código do boleto "${nome}" copiado:\n${codigo}); }); }); }); </script>
+  <div class="linha-boleto">
+    <span class="nome-boleto">MÁRCIA - FEVEREIRO - R$ 1.197,55</span>
+    <span class="codigo-boleto">00020101021226770014BR.GOV.BCB.PIX2555api.itau/pix/qr/v2/49f8e9f6-a667-490e-8ecd-0768f4587ac95204000053039865802BR5921CONSORCIO
+      OMEGA GD 126005BELEM62070503***6304F79D</span>
+    <button class="copy-btn">Copiar</button>
+  </div>
 
-<footer style="
-  display: flex;
-  align-items: center;
-  justify-content: center;   /* <— centraliza no eixo horizontal */
-  gap: 8px;
-  padding: 10px 0;
-">
-  <img src="minha-logo.png" alt="Logo" width="24" height="24">
-  <span>© 2025 Rogério Estumano</span>
-</footer>
+  <div class="linha-boleto">
+    <span class="nome-boleto">LOJA - JUNHO - R$ 2.204,20</span>
+    <span class="codigo-boleto">00020101021226770014BR.GOV.BCB.PIX2555api.itau/pix/qr/v2/824f1dac-2b79-4373-a141-d5a35ce160685204000053039865802BR5921CONSORCIO
+      OMEGA GD 126005BELEM62070503***63043402</span>
+    <button class="copy-btn">Copiar</button>
+  </div>
 
+  <div class="linha-boleto">
+    <span class="nome-boleto">LOJA - JULHO - R$ 2.135,86</span>
+    <span class="codigo-boleto">00020101021226770014BR.GOV.BCB.PIX2555api.itau/pix/qr/v2/14413ac1-23d3-4550-b30a-2fe7ad3e9a885204000053039865802BR5921CONSORCIO
+      OMEGA GD 126005BELEM62070503***630483A5</span>
+    <button class="copy-btn">Copiar</button>
+  </div>
+
+  <div class="linha-boleto">
+    <span class="nome-boleto">LOJA - AGOSTO - R$ 2.302,23</span>
+    <span class="codigo-boleto">00020101021226770014BR.GOV.BCB.PIX2555api.itau/pix/qr/v2/dd2ede7b-ed04-4ec0-a291-dd60ad82554f5204000053039865802BR5921CONSORCIO
+      OMEGA GD 126005BELEM62070503***6304D8CF</span>
+    <button class="copy-btn">Copiar</button>
+  </div>
+
+  <script>
+    document.querySelectorAll('.copy-btn').forEach(function (button) {
+      button.addEventListener('click', function () {
+        const codigo = this.parentElement.querySelector('.codigo-boleto').textContent;
+
+        navigator.clipboard.writeText(codigo).then(() => {
+          // muda a cor e texto
+          this.classList.add("copiado");
+          this.innerText = "Copiado!";
+
+          // volta ao normal depois de 2s
+          setTimeout(() => {
+            this.classList.remove("copiado");
+            this.innerText = "Copiar";
+          }, 2000);
+        });
+      });
+    });
+  </script>
+
+  <footer style="
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    padding: 10px 0;
+  ">
+    <img src="minha-logo.png" alt="Logo" width="24" height="24">
+    <span>© 2025 Rogério Estumano</span>
+  </footer>
 </body>
-
 </html>
