@@ -75,10 +75,15 @@
   
 
 
+<!-- Importa os ícones do Google -->
+<link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+
 <!-- Caixa de pergunta com botão de limpar -->
 <div class="pergunta-container">
-  <input type="text" id="perguntaInput" placeholder="Teste sua cópia aqui!" class="pergunta-input">
-  <button class="clear-btn" onclick="document.getElementById('perguntaInput').value=''">X</button>
+  <input type="text" id="perguntaInput" placeholder="Teste o código copiado!" class="pergunta-input">
+  <button class="clear-btn" onclick="document.getElementById('perguntaInput').value=''">
+    <span class="material-icons">close</span>
+  </button>
 </div>
 
 <style>
@@ -94,7 +99,7 @@
     width: 90%;
     max-width: 600px;
     padding: 12px 40px 12px 16px; /* espaço para o botão */
-    border: 1px solid #000;
+    border: 1px solid #ccc;
     border-radius: 8px;
     font-size: 16px;
     outline: none;
@@ -113,14 +118,13 @@
     transform: translateY(-50%);
     background: none;
     border: none;
-    font-size: 16px;
-    color: #555;
     cursor: pointer;
-    display: none; /* começa escondido */
+    display: none;
+    color: #ff0000;
   }
 
   .clear-btn:hover {
-    color: #000;
+    color: #555;
   }
 </style>
 
@@ -132,7 +136,15 @@
   input.addEventListener("input", () => {
     clearBtn.style.display = input.value ? "block" : "none";
   });
+
+  // Ao clicar, limpa o campo e some de novo
+  clearBtn.addEventListener("click", () => {
+    input.value = "";
+    clearBtn.style.display = "none";
+    input.focus();
+  });
 </script>
+
 
   
   <h4>Códigos de Barras</h4>
