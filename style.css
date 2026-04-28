@@ -172,7 +172,7 @@ body {
 
             /* Diminui o tamanho das logos das empresas */
             .logo-empresa {
-                height: 35px !important; /* Força a redução de 60px para 35px */
+                height: 10px !important; /* Força a redução de 60px para 35px */
             }
 
             /* Ajusta a logo principal (Rogério) no topo para não quebrar no celular */
