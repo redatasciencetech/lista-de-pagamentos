@@ -1,184 +1,152 @@
 <!DOCTYPE html>
-<html lang="pt-br">
+<html lang="pt-BR">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Faturas</title>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <title>Tela de Boas-Vindas</title>
     <style>
-        /* CSS REUTILIZADO DO SEU PROJETO */
-        * { margin: 0; padding: 0; box-sizing: border-box; font-family: Arial, sans-serif; }
-        body { background: #f4f6f8; }
+        /* Importando uma fonte limpa e moderna do Google Fonts */
+        @import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700&display=swap');
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Montserrat', sans-serif;
+        }
+
+        /* Fundo inspirado na sua paleta escura */
+        body {
+            background-color: #0a0a0a;
+            color: #ffffff;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            overflow: hidden;
+        }
+
+        /* Container principal da animação */
+        .welcome-container {
+            text-align: center;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 30px;
+        }
+
+        /* Estilo e animação da frase de boas-vindas */
+        .welcome-text {
+            font-size: 2.5rem;
+            font-weight: 600;
+            letter-spacing: 2px;
+            /* Degradê dourado inspirado no seu print */
+            background: linear-gradient(90deg, #A67C00 0%, #E1C158 50%, #FFDF73 100%);
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+            opacity: 0;
+            transform: translateY(20px);
+            /* Animação: duração de 1s, ease-out para suavidade */
+            animation: fadeUpIn 1.2s ease-out forwards;
+        }
+
+        /* Container e animação da logo do cliente */
+        .client-logo-wrapper {
+            background: black; /* Leve fundo para destacar a logo */
+            padding: 10px 20px;
+            border-radius: 12px;
+            border: 1px solid goldenrod; /* Borda sutil dourada */
+            opacity: 0;
+            transform: scale(0.9);
+            /* Animação: começa após 1.5s (depois que a frase já apareceu) */
+            animation: fadeInScale 1s ease-out 1.5s forwards;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+        }
+
+        .client-logo-wrapper img {
+            max-width: 250px;
+            height: auto;
+            display: grid;
+        }
+
+        .logo-empresa {
+            background: none;
+            border: none;
+            cursor: pointer;
+        }
+
+
+
+        /* Rodapé sutil com a sua marca */
+        .brand-footer {
+            position: absolute;
+            bottom: 30px;
+            opacity: 0;
+            /* Aparece suavemente no final */
+            animation: fadeIn 1s ease-out 2.5s forwards;
+        }
+
+        .brand-footer p {
+            font-size: 0.8rem;
+            color: #666;
+            letter-spacing: 1px;
+        }
+
+        .brand-footer span {
+            color: #E1C158;
+            font-weight: 700;
+        }
+
+        /* --- KEYFRAMES (Definição das animações) --- */
         
-        .logo-rogerio { background: linear-gradient(90deg, black, goldenrod); padding: 20px; display: flex; gap: 20px; align-items: center; justify-content: flex-start; border-bottom: 2px solid #ddd; flex-wrap: wrap; }
-        .seletor-empresas { background: white; padding: 20px; display: flex; gap: 20px; align-items: center; justify-content: center; border-bottom: 2px solid #ddd; flex-wrap: wrap; }
-        .logo-empresa { height: 60px; cursor: pointer; border: 2px solid transparent; border-radius: 8px; transition: 0.2s; }
-        .logo-empresa:hover { border-color: #0d2bd7; transform: scale(1.05); }
-        .btn-todas { padding: 10px 20px; background: linear-gradient(90deg, black, goldenrod); color: white; border: none; border-radius: 8px; cursor: pointer; font-weight: bold; }
-        .topo { background: linear-gradient(90deg, black, goldenrod); color: white; padding: 30px; border-radius: 15px; margin: 20px; display: flex; justify-content: space-between; align-items: center; }
-        .resumo { margin-top: 10px; font-size: 15px; }
-        .container { padding: 20px; }
-        .cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 20px; }
-        .card { background: #eaecef; border-radius: 20px; overflow: hidden; text-align: center; box-shadow: 0 4px 6px rgba(0,0,0,0.05); }
-        .card-header { background: #22c1a6; color: white; padding: 15px; font-weight: bold; }
-        .card-body { padding: 20px; }
-        .valor { font-size: 26px; color: #0d2bd7; margin-bottom: 10px; font-weight: bold; }
-        .info { font-size: 13px; color: #555; margin-bottom: 15px; }
-        .pix-box { border: 2px solid #0d2bd7; border-radius: 15px; padding: 15px; margin-top: 15px; background-color: white; }
-        .pix-box button { width: 100%; padding: 12px; border-radius: 20px; border: none; margin-top: 8px; cursor: pointer; font-weight: bold; }
-        .btn-copiar { background: #0d2bd7; color: white; }
-        .btn-qr { background: transparent; border: 2px solid #0d2bd7 !important; color: #0d2bd7; }
-        .historico-container { background: white; margin: 40px 20px 20px 20px; padding: 25px; border-radius: 15px; box-shadow: 0 4px 6px rgba(0,0,0,0.05); display: none; }
-        .historico-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; flex-wrap: wrap; gap: 15px; }
-        .filtro-ano { padding: 10px; border-radius: 8px; border: 2px solid #ddd; font-weight: bold; cursor: pointer; }
-        .tabela-responsiva { overflow-x: auto; }
-        .tabela-historico { width: 100%; border-collapse: collapse; min-width: 500px; }
-        .tabela-historico th, .tabela-historico td { padding: 15px; text-align: left; border-bottom: 1px solid #eee; }
-        .status-pago { background-color: #e8fff3; color: #50cd89; padding: 5px 10px; border-radius: 6px; font-size: 12px; font-weight: bold; }
-        .historico-total { margin-top: 20px; text-align: right; font-size: 18px; }
-        .historico-total span { font-size: 24px; font-weight: bold; color: #0d2bd7; }
+        /* Animação de subir e aparecer */
+        @keyframes fadeUpIn {
+            0% {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            100% {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* Animação de surgir e aumentar levemente (efeito de profundidade) */
+        @keyframes fadeInScale {
+            0% {
+                opacity: 0;
+                transform: scale(0.85);
+            }
+            100% {
+                opacity: 1;
+                transform: scale(1);
+            }
+        }
+
+        /* Fade in simples */
+        @keyframes fadeIn {
+            0% { opacity: 0; }
+            100% { opacity: 1; }
+        }
     </style>
 </head>
 <body>
 
-<div class="logo-rogerio">
-    <img src="mylogoR.png" onclick="selecionarEmpresa('todas')" class="logo-empresa" alt="Logo do Rogério" style="height: 80px; border: none; margin: 20px;">
-    <span style="font-size: 24px; font-weight: bold; color: white;">Faturas em aberto | Histórico de pagamentos</span>
-</div>
+    <div class="welcome-container">
+        <h1 class="welcome-text">SEJA BEM-VINDO!</h1>
 
+        <div class="client-logo-wrapper">
+            <a href="menu.html" class="logo-empresa">
+            <img src="marg_logo.jpg" alt="Logo da Empresa Cliente">
+            </a>
+        </div>
 
-<div class="seletor-empresas">
-    <img src="aguasdopara-logo.png" onclick="selecionarEmpresa('aguas')" class="logo-empresa" alt="Águas do Pará">
-    <img src="equatorial-logo.png" onclick="selecionarEmpresa('equatorial')" class="logo-empresa" alt="Equatorial">
-    <img src="serena-logo.png" onclick="selecionarEmpresa('serena')" class="logo-empresa" alt="Serena">
-    <img src="clariai-logo.png" onclick="selecionarEmpresa('clariai')" class="logo-empresa" alt="Clariai">
-    <img src="sense-logo.png" onclick="selecionarEmpresa('sense')" class="logo-empresa" alt="Sense">
-
-
-    <button onclick="selecionarEmpresa('todas')" class="btn-todas">Ver Todas</button>
-</div>
-
-<div class="topo">
-    <div>
-        <h1>Faturas em aberto</h1>
-        <p id="resumo" class="resumo">Carregando dados...</p>
     </div>
-</div>
 
-<div class="container">
-    <div id="cards" class="cards"></div>
-</div>
-
-<div id="areaHistorico" class="historico-container">
-    <div class="historico-header">
-        <h2>Histórico de Pagamentos</h2>
-        <select id="filtroAno" class="filtro-ano" onchange="aplicarFiltros()">
-            <option value="todos">Todos os Anos</option>
-            <option value="2026">2026</option>
-            <option value="2025">2025</option>
-            <option value="2024">2024</option>
-        </select>
+    <div class="brand-footer">
+        <p>POWERED BY <span>ROGÉRIO ESTUMANO</span> | TECH</p>
     </div>
-    <div class="tabela-responsiva">
-        <table class="tabela-historico">
-            <thead>
-                <tr><th>Referência</th><th>Vencimento</th><th>Pagamento</th><th>Status</th><th>Valor</th></tr>
-            </thead>
-            <tbody id="corpoTabelaHistorico"></tbody>
-        </table>
-    </div>
-    <div class="historico-total" id="totalHistorico">Total acumulado: <span>R$ 0,00</span></div>
-</div>
 
-<script>
-    let bancoDeDados = { faturasAbertas: [], historicoPagamentos: [] };
-    let empresaSelecionada = 'todas';
-
-    // FUNÇÃO PARA BUSCAR O JSON EXTERNO
-    async function carregarDados() {
-        try {
-            const resposta = await fetch('dados.json');
-            if (!resposta.ok) throw new Error('Não foi possível carregar o arquivo dados.json');
-            bancoDeDados = await resposta.json();
-            aplicarFiltros();
-        } catch (erro) {
-            console.error(erro);
-            document.getElementById("resumo").innerHTML = "Erro ao carregar dados. Use o Live Server.";
-        }
-    }
-
-    function selecionarEmpresa(nome) {
-        empresaSelecionada = nome;
-        aplicarFiltros();
-    }
-
-    function aplicarFiltros() {
-        const ano = document.getElementById("filtroAno").value;
-        
-        // Filtrar cards
-        let abertas = bancoDeDados.faturasAbertas;
-        if (empresaSelecionada !== 'todas') abertas = abertas.filter(f => f.empresa === empresaSelecionada);
-        renderizarFaturas(abertas);
-
-        // Filtrar histórico
-        let historico = bancoDeDados.historicoPagamentos;
-        if (empresaSelecionada !== 'todas') historico = historico.filter(h => h.empresa === empresaSelecionada);
-        if (ano !== 'todos') historico = historico.filter(h => h.dataPagamento.split('/')[2] === ano);
-        renderizarHistorico(historico);
-    }
-
-    function renderizarFaturas(lista) {
-        const container = document.getElementById("cards");
-        container.innerHTML = lista.length ? "" : "<p>Nenhuma fatura em aberto.</p>";
-        const total = lista.reduce((s, f) => s + f.valor, 0);
-        document.getElementById("resumo").innerHTML = `Você possui <b>${lista.length} faturas</b>, totalizando <b>${total.toLocaleString('pt-BR', {style: 'currency', currency: 'BRL'})}</b>`;
-        
-        lista.forEach(f => {
-            container.innerHTML += `
-                <div class="card">
-                    <div class="card-header">${f.mes}</div>
-                    <div class="card-body">
-                        <div class="valor">${f.valor.toLocaleString('pt-BR', {style: 'currency', currency: 'BRL'})}</div>
-                        <div class="info">Vencimento: ${f.vencimento}</div>
-                        <div class="pix-box">
-                            <button class="btn-copiar" onclick="copiar('${f.codigoPix}')">PIX</button>
-                            <button class="btn-qr" onclick="copiar('${f.codigoBoleto}')">BOLETO</button>
-                        </div>
-                    </div>
-                </div>`;
-        });
-    }
-
-    function renderizarHistorico(lista) {
-        const area = document.getElementById("areaHistorico");
-        const corpo = document.getElementById("corpoTabelaHistorico");
-        corpo.innerHTML = "";
-        
-        if (empresaSelecionada === 'todas' && lista.length === 0) {
-            area.style.display = "none";
-            return;
-        }
-        area.style.display = "block";
-
-        let total = 0;
-        lista.forEach(h => {
-            total += h.valor;
-            corpo.innerHTML += `
-                <tr>
-                    <td><strong>${h.mes}</strong></td>
-                    <td>${h.vencimento}</td>
-                    <td>${h.dataPagamento}</td>
-                    <td><span class="status-pago">Pago</span></td>
-                    <td>${h.valor.toLocaleString('pt-BR', {style: 'currency', currency: 'BRL'})}</td>
-                </tr>`;
-        });
-        document.getElementById("totalHistorico").innerHTML = `Total acumulado: <span>${total.toLocaleString('pt-BR', {style: 'currency', currency: 'BRL'})}</span>`;
-    }
-
-    function copiar(c) { navigator.clipboard.writeText(c); alert("Código copiado!"); }
-
-    // Iniciar carregamento
-    carregarDados();
-</script>
 </body>
 </html>

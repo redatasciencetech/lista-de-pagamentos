@@ -1,68 +1,161 @@
-/* Container de cada item */
-.item {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 12px;
-  padding: 10px 12px;
-  background: var(--card);
-  border: 1px solid #ddd;
-  border-radius: 8px;
-  margin-bottom: 10px;
+/* style.css */
+@import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700&display=swap');
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'Montserrat', sans-serif;
 }
 
-/* Área de informações (descrição + código) */
-.info {
-  display: flex;
-  gap: 12px;
-  align-items: center;
-  flex: 1;
-  min-width: 0; /* 👈 ESSENCIAL para permitir o ellipsis funcionar no flex */
+body {
+    background-color: #0a0a0a;
+    color: #ffffff;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    min-height: 100vh;
+    padding: 20px;
+    position: relative; /* Importante para o rodapé e botão flutuante */
 }
 
-/* Descrição do pagamento */
-.descricao {
-  font-weight: 600;
-  color: #222;
-  flex: 1;
-  min-width: 0; /* 👈 impede o texto de empurrar os botões */
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis; /* Mostra "..." quando o texto for longo */
+/* =========================================
+   CABEÇALHO (HEADER)
+========================================= */
+.header {
+    text-align: center;
+    margin-bottom: 50px;
 }
 
-/* Código (PIX / barras) */
-.codigo {
-  font-family: monospace;
-  font-size: 0.95rem;
-  color: #444;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  max-width: 40%;
+.header h1 {
+    font-size: 1.8rem;
+    letter-spacing: 2px;
+    background: linear-gradient(90deg, #A67C00, #FFDF73);
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+    margin-bottom: 10px;
 }
 
-/* Botões */
-.acoes {
-  display: flex;
-  gap: 8px;
-  flex-shrink: 0; /* 👈 garante que os botões nunca encolham */
+.header p {
+    color: white;
+    font-size: 0.9rem;
 }
 
-.btn {
-  border: 0;
-  padding: 6px 10px;
-  border-radius: 6px;
-  cursor: pointer;
-  font-size: 14px;
+/* =========================================
+   GRID E CARDS DE MENU
+========================================= */
+.menu-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 20px;
+    max-width: 500px;
+    width: 100%;
 }
-.copy-btn { background: var(--primary); color: #fff; }
-.remove-btn { background: var(--danger); color: #fff; }
-.copy-btn:hover, .remove-btn:hover { filter: brightness(.95); }
 
-/* Responsivo */
-@media (max-width: 600px) {
-  .codigo { max-width: 35%; }
-  .info { flex-direction: column; align-items: flex-start; gap: 6px; }
-  .acoes { width: 100%; justify-content: flex-end; }
+.menu-card {
+    background: #141414;
+    border: 1px solid goldenrod;
+    border-radius: 15px;
+    padding: 30px 20px;
+    text-align: center;
+    text-decoration: none;
+    color: gray;
+    transition: all 0.3s ease;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 15px;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+}
+
+.card-destaque {
+    color: white;
+    border: 2px solid #E1C158; /* Borda um pouco mais grossa para destacar */
+    background: rgba(225, 193, 88, 0.05); /* Fundo levemente dourado */
+}
+
+.menu-card:hover {
+    transform: translateY(-5px);
+    border-color: #E1C158;
+    background: #1c1c1c;
+    box-shadow: 0 10px 25px rgba(166, 124, 0, 0.2);
+    color: white; /* Garante que o texto cinza fique branco ao passar o mouse */
+}
+
+.icon {
+    font-size: 2rem;
+    color: #E1C158;
+}
+
+.menu-card span {
+    font-weight: 600;
+    font-size: 1.1rem;
+    letter-spacing: 1px;
+}
+
+/* =========================================
+   RODAPÉ ASSINATURA
+========================================= */
+.footer-brand {
+    margin-top: 60px;
+    font-size: 0.7rem;
+    color: white;
+    letter-spacing: 2px;
+    text-align: center;
+}
+
+.footer-brand b {
+    color: #A67C00;
+}
+
+/* =========================================
+   BOTÃO FLUTUANTE DO WHATSAPP
+========================================= */
+.whatsapp-float {
+    position: fixed;
+    bottom: 30px;
+    right: 30px;
+    background-color: #25D366;
+    color: #FFF;
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    text-decoration: none;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.5);
+    z-index: 1000;
+    transition: all 0.3s ease;
+}
+
+.whatsapp-float:hover {
+    transform: scale(1.1);
+    box-shadow: 0 6px 20px rgba(37, 211, 102, 0.4);
+    background-color: #20b858;
+    color: white; /* Garante que o ícone continue branco */
+}
+
+/* =========================================
+   RESPONSIVIDADE (CELULAR)
+========================================= */
+@media (max-width: 768px) {
+    .whatsapp-float {
+        width: 50px;
+        height: 50px;
+        bottom: 20px;
+        right: 20px;
+    }
+    .whatsapp-float svg {
+        width: 28px;
+        height: 28px;
+    }
+}
+
+@media (max-width: 400px) {
+    .menu-grid {
+        grid-template-columns: 1fr;
+    }
 }
