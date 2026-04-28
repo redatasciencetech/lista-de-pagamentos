@@ -177,7 +177,7 @@ body {
 
             /* Ajusta a logo principal (Rogério) no topo para não quebrar no celular */
             .logo-rogerio .logo-empresa {
-                height: 50px !important; 
+                height: 10px !important; 
                 margin: 0 !important;
             }
 
