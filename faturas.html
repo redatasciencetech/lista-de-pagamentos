@@ -16,7 +16,7 @@
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: Arial, sans-serif; }
         body { background: #f4f6f8; }
         
-        .logo-rogerio { background: linear-gradient(90deg, black, goldenrod); padding: 20px; display: flex; gap: 20px; align-items: center; justify-content: flex-start; border-bottom: 2px solid #ddd; flex-wrap: wrap; }
+        .logo-rogerio { background: black; padding: 20px; display: flex; gap: 20px; align-items: center; justify-content: flex-start; border-bottom: 2px solid #ddd; flex-wrap: wrap; }
         .seletor-empresas { background: white; padding: 20px; display: flex; gap: 20px; align-items: center; justify-content: center; border-bottom: 2px solid #ddd; flex-wrap: wrap; }
         .logo-empresa { height: 60px; cursor: pointer; border: 2px solid transparent; border-radius: 8px; transition: 0.2s; }
         .logo-empresa:hover { border-color: #0d2bd7; transform: scale(1.05); }
@@ -77,6 +77,8 @@
 
 
 <div class="seletor-empresas">
+    <button onclick="selecionarEmpresa('todas')" class="btn-todas">Ver Todas</button>
+    
     <img src="aguasdopara-logo.png" onclick="selecionarEmpresa('aguas')" class="logo-empresa" alt="Águas do Pará">
     <img src="equatorial-logo.png" onclick="selecionarEmpresa('equatorial')" class="logo-empresa" alt="Equatorial">
     <img src="serena-logo.png" onclick="selecionarEmpresa('serena')" class="logo-empresa" alt="Serena">
@@ -84,7 +86,7 @@
     <img src="sense-logo.png" onclick="selecionarEmpresa('sense')" class="logo-empresa" alt="Sense">
 
 
-    <button onclick="selecionarEmpresa('todas')" class="btn-todas">Ver Todas</button>
+    
 </div>
 
 <div class="topo">

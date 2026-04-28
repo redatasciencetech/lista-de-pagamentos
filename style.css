@@ -164,32 +164,47 @@ body {
            RESPONSIVIDADE PARA CELULAR (Telas até 768px)
         ========================================= */
         @media (max-width: 768px) {
-            /* Deixa a área branca mais compacta */
+            /* Organiza a caixa branca das empresas */
             .seletor-empresas {
-                padding: 10px;
-                gap: 12px; /* Reduz o espaço entre as logos */
+                padding: 15px;
+                display: flex;
+                flex-wrap: wrap;
+                justify-content: center;
+                align-items: center;
+                gap: 20px 10px; /* 20px de espaço vertical, 10px horizontal */
             }
 
-            /* Diminui o tamanho das logos das empresas */
-            .logo-empresa {
-                height: 10px !important; /* Força a redução de 60px para 35px */
+            /* O SEGREDO AQUI: Força 2 colunas perfeitas apenas para as logos dos clientes */
+            .seletor-empresas .logo-empresa {
+                height: auto !important;
+                max-height: 35px !important; /* Limita a altura máxima */
+                width: calc(50% - 15px) !important; /* Ocupa metade da tela (2 colunas) */
+                object-fit: contain; /* Impede a imagem de esticar/distorcer */
             }
 
-            /* Ajusta a logo principal (Rogério) no topo para não quebrar no celular */
+            /* Deixa o botão "Ver Todas" centralizado e largo no final */
+            .btn-todas {
+                width: 80%;
+                margin-top: 10px;
+                padding: 12px;
+            }
+
+            /* Ajusta o topo (Sua logo e título) para não quebrar no celular */
+            .logo-rogerio {
+                flex-direction: column;
+                justify-content: center;
+                padding: 20px 10px;
+                gap: 10px;
+            }
+
             .logo-rogerio .logo-empresa {
-                height: 10px !important; 
+                height: 60px !important;
                 margin: 0 !important;
             }
 
             .logo-rogerio span {
-                font-size: 18px !important;
+                font-size: 16px !important;
                 text-align: center;
-                width: 100%;
-            }
-
-            /* Deixa o botão "Ver Todas" mais proporcional */
-            .btn-todas {
-                padding: 8px 15px;
-                font-size: 14px;
+                line-height: 1.4;
             }
         }
