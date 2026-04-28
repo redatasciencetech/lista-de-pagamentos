@@ -1,47 +1,55 @@
-/* style.css */
+/* style.css - VERSÃO COMPLETA E CORRIGIDA */
 @import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700&display=swap');
 
-* {
-    margin: 0;
-    padding: 0;
-    box-sizing: border-box;
-    font-family: 'Montserrat', sans-serif;
-}
+* { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Montserrat', sans-serif; }
 
-body {
-    background-color: #0a0a0a;
-    color: #ffffff;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    min-height: 100vh;
-    padding: 20px;
-    position: relative; /* Importante para o rodapé e botão flutuante */
-}
+body { background-color: #0a0a0a; color: #ffffff; min-height: 100vh; display: flex; flex-direction: column; align-items: center; }
 
 /* =========================================
-   CABEÇALHO (HEADER)
+   BARRA SUPERIOR PADRÃO (NAVBAR)
 ========================================= */
-.header {
-    text-align: center;
-    margin-bottom: 50px;
+.top-bar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background-color: #000000;
+    padding: 20px 50px;
+    width: 100%;
+    border-bottom: 1px solid rgba(225, 193, 88, 0.2);
 }
+.brand img { height: 60px; object-fit: contain; cursor: pointer; }
+.page-title { text-align: right; }
+.page-title h1 { color: #E1C158; font-size: 1.8rem; letter-spacing: 2px; margin-bottom: 5px; text-transform: uppercase; }
+.page-title p { color: #ffffff; font-size: 0.8rem; letter-spacing: 2px; text-transform: uppercase; }
 
-.header h1 {
-    font-size: 1.8rem;
-    letter-spacing: 2px;
-    background: linear-gradient(90deg, #A67C00, #FFDF73);
-    -webkit-background-clip: text;
-    background-clip: text;
-    -webkit-text-fill-color: transparent;
-    margin-bottom: 10px;
-}
+/* =========================================
+   ELEMENTOS DAS FATURAS (PÁGINA FATURAS)
+========================================= */
+.seletor-empresas { background: white; padding: 20px; display: flex; gap: 20px; align-items: center; justify-content: center; width: 100%; border-bottom: 2px solid #ddd; flex-wrap: wrap; }
+.logo-empresa-cliente { height: 60px; cursor: pointer; transition: 0.2s; border: 2px solid transparent; border-radius: 8px; }
+.logo-empresa-cliente:hover { border-color: #0d2bd7; transform: scale(1.05); }
 
-.header p {
-    color: white;
-    font-size: 0.9rem;
-}
+.faturas-topo-info { background: linear-gradient(90deg, #000, #A67C00); color: white; padding: 30px; border-radius: 15px; margin: 20px; width: 95%; max-width: 1200px; }
+.resumo { margin-top: 10px; font-size: 15px; }
+
+.cards-container { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 20px; padding: 20px; width: 100%; max-width: 1200px; }
+.card-fatura { background: #f4f6f8; border-radius: 20px; overflow: hidden; text-align: center; box-shadow: 0 4px 6px rgba(0,0,0,0.1); color: #333; }
+.card-fatura-header { background: #22c1a6; color: white; padding: 15px; font-weight: bold; text-transform: uppercase; }
+.card-fatura-body { padding: 20px; }
+.card-fatura-valor { font-size: 26px; color: #0d2bd7; margin-bottom: 10px; font-weight: bold; }
+.card-fatura-info { font-size: 13px; color: #555; margin-bottom: 15px; }
+.pix-box { border: 2px solid #0d2bd7; border-radius: 15px; padding: 15px; background-color: white; display: flex; flex-direction: column; gap: 8px; }
+.btn-pagar { background: #0d2bd7; color: white; border: none; padding: 12px; border-radius: 20px; font-weight: bold; cursor: pointer; }
+
+/* =========================================
+   HISTÓRICO (TABELA)
+========================================= */
+.historico-container { background: white; margin: 20px; padding: 25px; border-radius: 15px; width: 95%; max-width: 1200px; color: #333; display: none; }
+.historico-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; flex-wrap: wrap; gap: 15px; }
+.tabela-responsiva { overflow-x: auto; }
+.tabela-historico { width: 100%; border-collapse: collapse; min-width: 500px; }
+.tabela-historico th, .tabela-historico td { padding: 15px; text-align: left; border-bottom: 1px solid #eee; }
+.status-pago { background-color: #e8fff3; color: #50cd89; padding: 5px 10px; border-radius: 6px; font-size: 12px; font-weight: bold; }
 
 /* =========================================
    GRID E CARDS DE MENU
@@ -52,28 +60,39 @@ body {
     gap: 20px;
     max-width: 500px;
     width: 100%;
+    margin-top: 50px;
 }
 
 .menu-card {
     background: #141414;
-    border: 1px solid goldenrod;
+    border: 1px solid rgba(218, 165, 32, 0.4);
     border-radius: 15px;
     padding: 30px 20px;
     text-align: center;
     text-decoration: none;
-    color: gray;
+    color: #777777;
     transition: all 0.3s ease;
     display: flex;
     flex-direction: column;
     align-items: center;
     gap: 15px;
-    box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+}
+
+.menu-card .icon {
+    font-size: 2.2rem;
+    opacity: 0.5; 
+    transition: all 0.3s ease;
 }
 
 .card-destaque {
-    color: white;
-    border: 2px solid #E1C158; /* Borda um pouco mais grossa para destacar */
-    background: rgba(225, 193, 88, 0.05); /* Fundo levemente dourado */
+    color: #ffffff;
+    border: 1px solid #E1C158;
+    background: #141414;
+}
+
+.card-destaque .icon {
+    opacity: 1;
 }
 
 .menu-card:hover {
@@ -81,12 +100,11 @@ body {
     border-color: #E1C158;
     background: #1c1c1c;
     box-shadow: 0 10px 25px rgba(166, 124, 0, 0.2);
-    color: white; /* Garante que o texto cinza fique branco ao passar o mouse */
+    color: #ffffff;
 }
 
-.icon {
-    font-size: 2rem;
-    color: #E1C158;
+.menu-card:hover .icon {
+    opacity: 1;
 }
 
 .menu-card span {
@@ -96,10 +114,79 @@ body {
 }
 
 /* =========================================
-   RODAPÉ ASSINATURA
+   PÁGINA DE RELATÓRIO E DASHBOARD
+========================================= */
+.report-summary {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+    gap: 15px;
+    width: 100%;
+    max-width: 800px;
+    margin: 30px 0;
+    padding: 0 20px;
+}
+
+.summary-item {
+    background: #141414;
+    padding: 20px;
+    border-radius: 12px;
+    border-left: 4px solid #E1C158;
+    text-align: left;
+}
+
+.summary-item small { color: #888; font-size: 0.65rem; text-transform: uppercase; }
+.summary-item h3 { color: #fff; font-size: 1.2rem; margin-top: 5px; }
+.summary-item .valor-negativo { color: #ff4d4d; }
+
+.filter-section {
+    background: #1a1a1a;
+    width: 90%;
+    max-width: 800px;
+    padding: 20px;
+    border-radius: 15px;
+    margin-bottom: 20px;
+    border: 1px solid rgba(225, 193, 88, 0.1);
+}
+
+.filter-group {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+}
+
+.filter-group select {
+    background: #0a0a0a;
+    color: white;
+    border: 1px solid #444;
+    padding: 10px;
+    border-radius: 8px;
+    flex: 1;
+    cursor: pointer;
+}
+
+.expense-list { width: 90%; max-width: 800px; display: flex; flex-direction: column; gap: 10px; }
+.expense-card {
+    background: #141414;
+    padding: 15px 20px;
+    border-radius: 10px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    text-align: left;
+}
+
+.expense-info h4 { font-size: 0.95rem; margin-bottom: 3px; color: #eee; }
+.expense-info p { font-size: 0.75rem; color: #666; }
+
+.expense-value { text-align: right; }
+.expense-value .price { color: #E1C158; font-weight: bold; display: block; }
+.expense-value .status { font-size: 0.6rem; padding: 3px 8px; border-radius: 10px; text-transform: uppercase; display: inline-block; margin-top: 5px; font-weight: 600; }
+
+/* =========================================
+   RODAPÉ E WHATSAPP
 ========================================= */
 .footer-brand {
-    margin-top: 60px;
+    margin: 60px 0 30px 0;
     font-size: 0.7rem;
     color: white;
     letter-spacing: 2px;
@@ -107,104 +194,38 @@ body {
 }
 
 .footer-brand b {
-    color: #A67C00;
+    margin: 60px 0 30px 0;
+    font-size: 0.7rem;
+    color: goldenrod;
+    letter-spacing: 2px;
+    text-align: center;
 }
 
-/* =========================================
-   BOTÃO FLUTUANTE DO WHATSAPP
-========================================= */
+
 .whatsapp-float {
     position: fixed;
     bottom: 30px;
     right: 30px;
     background-color: #25D366;
-    color: #FFF;
     width: 60px;
     height: 60px;
     border-radius: 50%;
     display: flex;
     justify-content: center;
     align-items: center;
-    text-decoration: none;
     box-shadow: 0 4px 15px rgba(0, 0, 0, 0.5);
     z-index: 1000;
-    transition: all 0.3s ease;
-}
-
-.whatsapp-float:hover {
-    transform: scale(1.1);
-    box-shadow: 0 6px 20px rgba(37, 211, 102, 0.4);
-    background-color: #20b858;
-    color: white; /* Garante que o ícone continue branco */
+    color: white;
 }
 
 /* =========================================
-   RESPONSIVIDADE (CELULAR)
+   RESPONSIVIDADE (CELULARES)
 ========================================= */
 @media (max-width: 768px) {
-    .whatsapp-float {
-        width: 50px;
-        height: 50px;
-        bottom: 20px;
-        right: 20px;
-    }
-    .whatsapp-float svg {
-        width: 28px;
-        height: 28px;
-    }
+    .top-bar { flex-direction: column; padding: 20px; text-align: center; gap: 15px; }
+    .page-title { text-align: center; }
+    .seletor-empresas img { width: calc(50% - 15px) !important; height: auto !important; max-height: 35px !important; object-fit: contain; }
+    .menu-grid { grid-template-columns: 1fr; padding: 20px; }
+    .expense-card { flex-direction: column; align-items: flex-start; gap: 10px; }
+    .expense-value { text-align: left; }
 }
-
-@media (max-width: 400px) {
-    .menu-grid {
-        grid-template-columns: 1fr;
-    }
-}
-
-/* =========================================
-           RESPONSIVIDADE PARA CELULAR (Telas até 768px)
-        ========================================= */
-        @media (max-width: 768px) {
-            /* Organiza a caixa branca das empresas */
-            .seletor-empresas {
-                padding: 15px;
-                display: flex;
-                flex-wrap: wrap;
-                justify-content: center;
-                align-items: center;
-                gap: 20px 10px; /* 20px de espaço vertical, 10px horizontal */
-            }
-
-            /* O SEGREDO AQUI: Força 2 colunas perfeitas apenas para as logos dos clientes */
-            .seletor-empresas .logo-empresa {
-                height: auto !important;
-                max-height: 35px !important; /* Limita a altura máxima */
-                width: calc(50% - 15px) !important; /* Ocupa metade da tela (2 colunas) */
-                object-fit: contain; /* Impede a imagem de esticar/distorcer */
-            }
-
-            /* Deixa o botão "Ver Todas" centralizado e largo no final */
-            .btn-todas {
-                width: 80%;
-                margin-top: 10px;
-                padding: 12px;
-            }
-
-            /* Ajusta o topo (Sua logo e título) para não quebrar no celular */
-            .logo-rogerio {
-                flex-direction: column;
-                justify-content: center;
-                padding: 20px 10px;
-                gap: 10px;
-            }
-
-            .logo-rogerio .logo-empresa {
-                height: 60px !important;
-                margin: 0 !important;
-            }
-
-            .logo-rogerio span {
-                font-size: 16px !important;
-                text-align: center;
-                line-height: 1.4;
-            }
-        }
