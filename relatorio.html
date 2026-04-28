@@ -5,6 +5,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Relatório de Despesas | MARG DRESS CODE</title>
     <link rel="stylesheet" href="style.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2"></script>
 </head>
 <body>
 
@@ -33,7 +35,13 @@
         </div>
     </div>
 
-    <div class="filter-section">
+    <div style="display: flex; flex-wrap: wrap; gap: 20px; width: 90%; max-width: 800px; margin: 20px auto;">
+        <div style="flex: 1; background: #141414; padding: 25px; border-radius: 15px; min-width: 300px; border: 1px solid rgba(225, 193, 88, 0.2); box-shadow: 0 10px 30px rgba(0,0,0,0.5);">
+            <canvas id="graficoCategorias"></canvas>
+        </div>
+    </div>
+
+    <div class="filter-section" style="margin: 20px auto;">
         <div class="filter-group">
             <select id="filtroAno" onchange="aplicarFiltros()">
                 <option value="2026">Ano: 2026</option>
@@ -54,7 +62,7 @@
         </div>
     </div>
 
-    <div class="expense-list" id="listaDespesas"></div>
+    <div class="expense-list" id="listaDespesas" style="margin: 0 auto;"></div>
 
     <div class="footer-brand">
         ROGÉRIO ESTUMANO | <b>DATA SCIENCE & TECH</b> © 2026
@@ -62,8 +70,8 @@
 
     <script>
         let despesasDB = [];
+        let meuGrafico;
 
-        // Função para buscar o JSON
         async function carregarDados() {
             try {
                 const resposta = await fetch('despesas.json');
@@ -75,7 +83,6 @@
             }
         }
 
-        // Função dos Filtros
         function aplicarFiltros() {
             const anoSelecionado = document.getElementById("filtroAno").value;
             const mesSelecionado = document.getElementById("filtroMes").value;
@@ -91,9 +98,62 @@
 
             renderizarCards(despesasFiltradas);
             calcularResumo(despesasFiltradas);
+            atualizarGrafico(despesasFiltradas);
         }
 
-        // Formatadores (Transformam os dados de banco de dados para leitura de usuário)
+        function atualizarGrafico(lista) {
+            const ctx = document.getElementById('graficoCategorias').getContext('2d');
+            
+            const totais = lista.reduce((acc, item) => {
+                acc[item.tipo] = (acc[item.tipo] || 0) + item.valor;
+                return acc;
+            }, {});
+
+            const totalSoma = Object.values(totais).reduce((a, b) => a + b, 0);
+
+            if (meuGrafico) meuGrafico.destroy();
+
+            meuGrafico = new Chart(ctx, {
+                type: 'doughnut',
+                plugins: [ChartDataLabels],
+                data: {
+                    labels: ['Fixo', 'Variável', 'Imposto'],
+                    datasets: [{
+                        data: [totais.fixo || 0, totais.variavel || 0, totais.imposto || 0],
+                        backgroundColor: ['#E1C158', '#A67C00', '#444444'],
+                        borderColor: '#141414',
+                        borderWidth: 4
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: true,
+                    plugins: {
+                        legend: { 
+                            position: 'bottom', 
+                            labels: { color: '#fff', font: { family: 'Montserrat', size: 12 } } 
+                        },
+                        title: { 
+                            display: true, 
+                            text: 'DISTRIBUIÇÃO PERCENTUAL', 
+                            color: '#E1C158', 
+                            font: { size: 16, weight: 'bold', family: 'Montserrat' },
+                            padding: { bottom: 20 }
+                        },
+                        datalabels: {
+                            color: '#fff',
+                            font: { weight: 'bold', size: 14 },
+                            formatter: (value) => {
+                                if (!value || value === 0) return null;
+                                return ((value / totalSoma) * 100).toFixed(1) + "%";
+                            }
+                        }
+                    },
+                    cutout: '60%' // Deixa o furo da rosca mais elegante
+                }
+            });
+        }
+
         function formatarMoeda(valor) {
             return valor.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
         }
@@ -103,20 +163,15 @@
             return `${dia}/${mes}/${ano}`;
         }
 
-        // Desenha as Despesas na Tela com a Lógica de Cores
         function renderizarCards(lista) {
             const container = document.getElementById("listaDespesas");
             container.innerHTML = "";
-
             if (lista.length === 0) {
-                container.innerHTML = "<p style='color: #888; text-align: center; padding: 20px;'>Nenhuma despesa para este filtro.</p>";
+                container.innerHTML = "<p style='color: #888; text-align: center; padding: 20px;'>Nenhuma despesa encontrada.</p>";
                 return;
             }
-
             lista.forEach(item => {
                 let textoTipo = item.tipo === 'fixo' ? 'Custo Fixo' : (item.tipo === 'imposto' ? 'Imposto' : 'Variável');
-                
-                // Lógica dinâmica das cores de status
                 let corStatus = item.status === 'Pago' ? '#22c1a6' : (item.status === 'Atrasado' ? '#ff4d4d' : '#FFDF73');
                 let corTextoStatus = item.status === 'Pago' ? '#fff' : (item.status === 'Atrasado' ? '#fff' : '#332b00');
 
@@ -135,7 +190,6 @@
             });
         }
 
-        // Calcula os totais do Painel Superior
         function calcularResumo(lista) {
             const dataHojeISO = new Date().toISOString().split('T')[0];
             let somaTotalAberto = 0;
@@ -153,7 +207,6 @@
             document.getElementById("previstoMes").innerText = formatarMoeda(somaMesFiltrado);
         }
 
-        // Dispara ao abrir a página
         carregarDados();
     </script>
 </body>
