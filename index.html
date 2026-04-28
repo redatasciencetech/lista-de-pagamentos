@@ -1,303 +1,184 @@
 <!DOCTYPE html>
-<html lang="pt-BR">
-
+<html lang="pt-br">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Códigos de Pagamentos</title>
-  <style>
-    h2 {
-      color: blueviolet;
-    }
-
-    h3 {
-      color: blue;
-    }
-
-    h4 {
-      color: red;
-    }
-
-    body {
-      font-family: Arial, sans-serif;
-      background: #f8f8f8;
-      padding: 20px;
-    }
-
-    .linha-boleto {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      background: #fff;
-      border: 1px solid #ddd;
-      padding: 10px 12px;
-      margin-bottom: 10px;
-      border-radius: 8px;
-      gap: 12px;
-    }
-
-    .nome-boleto {
-      min-width: 120px;
-      font-weight: bold;
-      color: #333;
-    }
-
-    .codigo-boleto {
-      flex: 1;
-      font-size: 14px;
-      overflow: hidden;
-      white-space: nowrap;
-      text-overflow: ellipsis;
-      margin-right: 8px;
-      color: #555;
-    }
-
-    .copy-btn {
-      background: #007bff;
-      border: none;
-      color: #fff;
-      padding: 6px 12px;
-      border-radius: 6px;
-      cursor: pointer;
-      font-size: 14px;
-      transition: background 0.2s;
-    }
-
-    .copy-btn:hover {
-      background: #0056b3;
-    }
-
-    /* Quando copiado */
-    .copy-btn.copiado {
-      background: #28a745 !important; /* verde */
-    }
-  </style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Faturas</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        /* CSS REUTILIZADO DO SEU PROJETO */
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: Arial, sans-serif; }
+        body { background: #f4f6f8; }
+        
+        .logo-rogerio { background: linear-gradient(90deg, black, goldenrod); padding: 20px; display: flex; gap: 20px; align-items: center; justify-content: flex-start; border-bottom: 2px solid #ddd; flex-wrap: wrap; }
+        .seletor-empresas { background: white; padding: 20px; display: flex; gap: 20px; align-items: center; justify-content: center; border-bottom: 2px solid #ddd; flex-wrap: wrap; }
+        .logo-empresa { height: 60px; cursor: pointer; border: 2px solid transparent; border-radius: 8px; transition: 0.2s; }
+        .logo-empresa:hover { border-color: #0d2bd7; transform: scale(1.05); }
+        .btn-todas { padding: 10px 20px; background: linear-gradient(90deg, black, goldenrod); color: white; border: none; border-radius: 8px; cursor: pointer; font-weight: bold; }
+        .topo { background: linear-gradient(90deg, black, goldenrod); color: white; padding: 30px; border-radius: 15px; margin: 20px; display: flex; justify-content: space-between; align-items: center; }
+        .resumo { margin-top: 10px; font-size: 15px; }
+        .container { padding: 20px; }
+        .cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 20px; }
+        .card { background: #eaecef; border-radius: 20px; overflow: hidden; text-align: center; box-shadow: 0 4px 6px rgba(0,0,0,0.05); }
+        .card-header { background: #22c1a6; color: white; padding: 15px; font-weight: bold; }
+        .card-body { padding: 20px; }
+        .valor { font-size: 26px; color: #0d2bd7; margin-bottom: 10px; font-weight: bold; }
+        .info { font-size: 13px; color: #555; margin-bottom: 15px; }
+        .pix-box { border: 2px solid #0d2bd7; border-radius: 15px; padding: 15px; margin-top: 15px; background-color: white; }
+        .pix-box button { width: 100%; padding: 12px; border-radius: 20px; border: none; margin-top: 8px; cursor: pointer; font-weight: bold; }
+        .btn-copiar { background: #0d2bd7; color: white; }
+        .btn-qr { background: transparent; border: 2px solid #0d2bd7 !important; color: #0d2bd7; }
+        .historico-container { background: white; margin: 40px 20px 20px 20px; padding: 25px; border-radius: 15px; box-shadow: 0 4px 6px rgba(0,0,0,0.05); display: none; }
+        .historico-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; flex-wrap: wrap; gap: 15px; }
+        .filtro-ano { padding: 10px; border-radius: 8px; border: 2px solid #ddd; font-weight: bold; cursor: pointer; }
+        .tabela-responsiva { overflow-x: auto; }
+        .tabela-historico { width: 100%; border-collapse: collapse; min-width: 500px; }
+        .tabela-historico th, .tabela-historico td { padding: 15px; text-align: left; border-bottom: 1px solid #eee; }
+        .status-pago { background-color: #e8fff3; color: #50cd89; padding: 5px 10px; border-radius: 6px; font-size: 12px; font-weight: bold; }
+        .historico-total { margin-top: 20px; text-align: right; font-size: 18px; }
+        .historico-total span { font-size: 24px; font-weight: bold; color: #0d2bd7; }
+    </style>
 </head>
-
 <body>
-  <img src="cabecalho.png" alt="Logo Cabeçalho.png" style="width: 100%; height: auto;">
-  
 
-
-<!-- Importa os ícones do Google -->
-<link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
-
-<!-- Caixa de pergunta com botão de limpar -->
-<div class="pergunta-container">
-  <input type="text" id="perguntaInput" placeholder="Teste aqui o código copiado!" class="pergunta-input">
-  <button class="clear-btn" onclick="document.getElementById('perguntaInput').value=''">
-    <span class="material-icons">close</span>
-  </button>
+<div class="logo-rogerio">
+    <img src="mylogoR.png" onclick="selecionarEmpresa('todas')" class="logo-empresa" alt="Logo do Rogério" style="height: 80px; border: none; margin: 20px;">
+    <span style="font-size: 24px; font-weight: bold; color: white;">Faturas em aberto | Histórico de pagamentos</span>
 </div>
 
-<style>
-  .pergunta-container {
-    width: 100%;
-    display: flex;
-    justify-content: center;
-    margin: 20px 0;
-    position: relative;
-  }
 
-  .pergunta-input {
-    width: 90%;
-    max-width: 600px;
-    padding: 12px 40px 12px 16px; /* espaço para o botão */
-    border: 1px solid #ccc;
-    border-radius: 8px;
-    font-size: 16px;
-    outline: none;
-    transition: border-color 0.3s, box-shadow 0.3s;
-  }
+<div class="seletor-empresas">
+    <img src="aguasdopara-logo.png" onclick="selecionarEmpresa('aguas')" class="logo-empresa" alt="Águas do Pará">
+    <img src="equatorial-logo.png" onclick="selecionarEmpresa('equatorial')" class="logo-empresa" alt="Equatorial">
+    <img src="serena-logo.png" onclick="selecionarEmpresa('serena')" class="logo-empresa" alt="Serena">
+    <img src="clariai-logo.png" onclick="selecionarEmpresa('clariai')" class="logo-empresa" alt="Clariai">
+    <img src="sense-logo.png" onclick="selecionarEmpresa('sense')" class="logo-empresa" alt="Sense">
 
-  .pergunta-input:focus {
-    border-color: #0d6efd;
-    box-shadow: 0 0 6px rgba(13, 110, 253, 0.5);
-  }
 
-  .clear-btn {
-    position: absolute;
-    right: 20px;
-    top: 50%;
-    transform: translateY(-50%);
-    background: none;
-    border: none;
-    cursor: pointer;
-    display: none;
-    color: #ff0000;
-  }
+    <button onclick="selecionarEmpresa('todas')" class="btn-todas">Ver Todas</button>
+</div>
 
-  .clear-btn:hover {
-    color: #555;
-  }
-</style>
+<div class="topo">
+    <div>
+        <h1>Faturas em aberto</h1>
+        <p id="resumo" class="resumo">Carregando dados...</p>
+    </div>
+</div>
+
+<div class="container">
+    <div id="cards" class="cards"></div>
+</div>
+
+<div id="areaHistorico" class="historico-container">
+    <div class="historico-header">
+        <h2>Histórico de Pagamentos</h2>
+        <select id="filtroAno" class="filtro-ano" onchange="aplicarFiltros()">
+            <option value="todos">Todos os Anos</option>
+            <option value="2026">2026</option>
+            <option value="2025">2025</option>
+            <option value="2024">2024</option>
+        </select>
+    </div>
+    <div class="tabela-responsiva">
+        <table class="tabela-historico">
+            <thead>
+                <tr><th>Referência</th><th>Vencimento</th><th>Pagamento</th><th>Status</th><th>Valor</th></tr>
+            </thead>
+            <tbody id="corpoTabelaHistorico"></tbody>
+        </table>
+    </div>
+    <div class="historico-total" id="totalHistorico">Total acumulado: <span>R$ 0,00</span></div>
+</div>
 
 <script>
-  const input = document.getElementById("perguntaInput");
-  const clearBtn = document.querySelector(".clear-btn");
+    let bancoDeDados = { faturasAbertas: [], historicoPagamentos: [] };
+    let empresaSelecionada = 'todas';
 
-  // Mostrar o botão apenas quando houver texto
-  input.addEventListener("input", () => {
-    clearBtn.style.display = input.value ? "block" : "none";
-  });
+    // FUNÇÃO PARA BUSCAR O JSON EXTERNO
+    async function carregarDados() {
+        try {
+            const resposta = await fetch('dados.json');
+            if (!resposta.ok) throw new Error('Não foi possível carregar o arquivo dados.json');
+            bancoDeDados = await resposta.json();
+            aplicarFiltros();
+        } catch (erro) {
+            console.error(erro);
+            document.getElementById("resumo").innerHTML = "Erro ao carregar dados. Use o Live Server.";
+        }
+    }
 
-  // Ao clicar, limpa o campo e some de novo
-  clearBtn.addEventListener("click", () => {
-    input.value = "";
-    clearBtn.style.display = "none";
-    input.focus();
-  });
-</script>
+    function selecionarEmpresa(nome) {
+        empresaSelecionada = nome;
+        aplicarFiltros();
+    }
 
-  
-  
+    function aplicarFiltros() {
+        const ano = document.getElementById("filtroAno").value;
+        
+        // Filtrar cards
+        let abertas = bancoDeDados.faturasAbertas;
+        if (empresaSelecionada !== 'todas') abertas = abertas.filter(f => f.empresa === empresaSelecionada);
+        renderizarFaturas(abertas);
 
+        // Filtrar histórico
+        let historico = bancoDeDados.historicoPagamentos;
+        if (empresaSelecionada !== 'todas') historico = historico.filter(h => h.empresa === empresaSelecionada);
+        if (ano !== 'todos') historico = historico.filter(h => h.dataPagamento.split('/')[2] === ano);
+        renderizarHistorico(historico);
+    }
 
-
-<img src="equatorial-logo.png" alt="equatorial-logo" style="width: 40%; height: auto;">
-
-
-<h4>PIX Copia e Cola</h4>
-
-<div class="linha-boleto">
-    <span class="nome-boleto">VENC:07/04_LOJA R$ 201,10</span>
-    <span class="codigo-boleto">00020126990014br.gov.bcb.pix01366a36f461-044b-4292-9090-a5a6d6954c080237Venc: 07.04.2026 - R$          201,105204000053039865406201.105802BR5915Equatorial Para6005Belem62270523BOLETO3373384209063434363047F6D</span>
-    <button class="copy-btn">Copiar</button>
-  </div>
-
-  
-<img src="aguasdopara-logo.png" alt="aguasdopara-logo.png" style="width: 30%; height: auto;">
-
-<h4>PIX Copia e Cola - LOJA</h4>
-<h4>PIX Copia e Cola - VILA</h4>
-
-
-
-
-<h3>OUTRAS CONTAS</h3>
-
-<div class="linha-boleto">
-    <span class="nome-boleto">VENC:20/04_SISTEMA CLARIAI R$ 228,90</span>
-    <span class="codigo-boleto">46191.11000 00000.000042 26937.875016 5 14220000022890</span>
-    <button class="copy-btn">Copiar</button>
-  </div>
- 
- 
-
-<img src="serena.png" alt="serena.png" style="width: 100%; height: auto;">
-
-  <h4>PIX Copia e Cola - (MÁRCIA)</h4>
-  
-  <div class="linha-boleto">
-    <span class="nome-boleto">MÁRCIA_DEZEMBRO R$ 358,91</span>
-    <span class="codigo-boleto">00020101021226770014BR.GOV.BCB.PIX2555api.itau/pix/qr/v2/f2b6a7dd-142f-4ae2-bc77-b3c9617fbdb75204000053039865802BR5921CONSORCIO OMEGA GD 126004042762070503***63049131</span>
-    <button class="copy-btn">Copiar</button>
-  </div>
-
-  <div class="linha-boleto">
-    <span class="nome-boleto">MÁRCIA_JANEIRO R$ 81,30</span>
-    <span class="codigo-boleto">00020101021226770014BR.GOV.BCB.PIX2555api.itau/pix/qr/v2/6f973ff1-ae67-4dbf-b0fc-5a2f1400ea555204000053039865802BR5921CONSORCIO OMEGA GD 126004042762070503***6304C7DB</span>
-    <button class="copy-btn">Copiar</button>
-  </div>
-
-  <div class="linha-boleto">
-    <span class="nome-boleto">MÁRCIA_FEVEREIRO R$ 70,23</span>
-    <span class="codigo-boleto">00020101021226770014BR.GOV.BCB.PIX2555api.itau/pix/qr/v2/241b81d8-7dd7-493d-afe9-94c83a4de1f55204000053039865802BR5921CONSORCIO OMEGA GD 126004042762070503***6304644B</span>
-    <button class="copy-btn">Copiar</button>
-  </div>
-
-<div class="linha-boleto">
-    <span class="nome-boleto">MÁRCIA_MARÇO R$ 169,82</span>
-    <span class="codigo-boleto">00020101021226770014BR.GOV.BCB.PIX2555api.itau/pix/qr/v2/fcc9bcd7-f261-4d4c-96a4-4bd800f1de225204000053039865802BR5922CONSORCIO SERENA GD 126004042762070503***6304ACFD</span>
-    <button class="copy-btn">Copiar</button>
-  </div>
-
-
-<h4>PIX Copia e Cola - (LOJA)</h4>
-  
- 
-<div class="linha-boleto">
-    <span class="nome-boleto">LOJA_OUTUBRO R$ 2.119,58</span>
-    <span class="codigo-boleto">00020101021226770014BR.GOV.BCB.PIX2555api.itau/pix/qr/v2/e7f4cbc9-2dfc-43dd-8e1a-1bbd5b9076495204000053039865802BR5922CONSORCIO SERENA GD 126004042762070503***6304D791</span>
-    <button class="copy-btn">Copiar</button>
-  </div>
-
-<div class="linha-boleto">
-    <span class="nome-boleto">LOJA_NOVEMBRO R$ 2.047,53</span>
-    <span class="codigo-boleto">00020101021226770014BR.GOV.BCB.PIX2555api.itau/pix/qr/v2/c8f5d203-d0a5-4156-bc99-e276bfc63dd15204000053039865802BR5921CONSORCIO OMEGA GD 126004042762070503***63042F64</span>
-    <button class="copy-btn">Copiar</button>
-  </div>
-
-<div class="linha-boleto">
-    <span class="nome-boleto">LOJA_DEZEMBRO R$ 1.915,75</span>
-    <span class="codigo-boleto">00020101021226770014BR.GOV.BCB.PIX2555api.itau/pix/qr/v2/004aab16-5f85-448e-835d-f2e37b16e4855204000053039865802BR5921CONSORCIO OMEGA GD 126004042762070503***630466A7</span>
-    <button class="copy-btn">Copiar</button>
-  </div>
-
-<div class="linha-boleto">
-    <span class="nome-boleto">LOJA_JANEIRO R$ 1.289,70</span>
-    <span class="codigo-boleto">00020101021226770014BR.GOV.BCB.PIX2555api.itau/pix/qr/v2/0f4c8f42-1475-40ba-8648-2b6ef89d781c5204000053039865802BR5921CONSORCIO OMEGA GD 126004042762070503***63049AAA</span>
-    <button class="copy-btn">Copiar</button>
-  </div>
-
-<div class="linha-boleto">
-    <span class="nome-boleto">LOJA_FEVEREIRO R$ 1.171,98</span>
-    <span class="codigo-boleto">00020101021226770014BR.GOV.BCB.PIX2555api.itau/pix/qr/v2/4209ee50-7865-4077-bccc-55da5e19abc05204000053039865802BR5921CONSORCIO OMEGA GD 126004042762070503***630470BD</span>
-    <button class="copy-btn">Copiar</button>
-  </div>
-
-<div class="linha-boleto">
-    <span class="nome-boleto">LOJA_MARÇO R$ 1.164,76</span>
-    <span class="codigo-boleto">00020101021226770014BR.GOV.BCB.PIX2555api.itau/pix/qr/v2/0b2583b8-d7d9-4f6f-ab27-edd068e9b0255204000053039865802BR5922CONSORCIO SERENA GD 126004042762070503***6304AB4B</span>
-    <button class="copy-btn">Copiar</button>
-  </div>
-
-  <img src="internetnio-logo.jpeg" alt="internetnio-logo" style="width: 90%; height: auto;">  
-
-<h4>Códigos de Barras</h4>
-
-<div class="linha-boleto">
-    <span class="nome-boleto">VENC:23/01_INTERNET-NIO-(JAN) R$ 159,85</span>
-    <span class="codigo-boleto">03399133500000159859068455000000026271730101</span>
-    <button class="copy-btn">Copiar</button>
-  </div>
-
-<div class="linha-boleto">
-    <span class="nome-boleto">VENC:23/02_INTERNET-NIO-(FEV) R$ 164,36</span>
-    <span class="codigo-boleto">03394136600000164369068455000000052942500101</span>
-    <button class="copy-btn">Copiar</button>
-  </div>
-
-
-  <script>
-    document.querySelectorAll('.copy-btn').forEach(function (button) {
-      button.addEventListener('click', function () {
-        const codigo = this.parentElement.querySelector('.codigo-boleto').textContent;
-
-        navigator.clipboard.writeText(codigo).then(() => {
-          // muda a cor e texto
-          this.classList.add("copiado");
-          this.innerText = "Copiado!";
-
-          // volta ao normal depois de 2s
-          setTimeout(() => {
-            this.classList.remove("copiado");
-            this.innerText = "Copiar";
-          }, 2000);
+    function renderizarFaturas(lista) {
+        const container = document.getElementById("cards");
+        container.innerHTML = lista.length ? "" : "<p>Nenhuma fatura em aberto.</p>";
+        const total = lista.reduce((s, f) => s + f.valor, 0);
+        document.getElementById("resumo").innerHTML = `Você possui <b>${lista.length} faturas</b>, totalizando <b>${total.toLocaleString('pt-BR', {style: 'currency', currency: 'BRL'})}</b>`;
+        
+        lista.forEach(f => {
+            container.innerHTML += `
+                <div class="card">
+                    <div class="card-header">${f.mes}</div>
+                    <div class="card-body">
+                        <div class="valor">${f.valor.toLocaleString('pt-BR', {style: 'currency', currency: 'BRL'})}</div>
+                        <div class="info">Vencimento: ${f.vencimento}</div>
+                        <div class="pix-box">
+                            <button class="btn-copiar" onclick="copiar('${f.codigoPix}')">PIX</button>
+                            <button class="btn-qr" onclick="copiar('${f.codigoBoleto}')">BOLETO</button>
+                        </div>
+                    </div>
+                </div>`;
         });
-      });
-    });
-  </script>
+    }
 
-  <footer style="
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 8px;
-    padding: 10px 0;
-  ">
-    <img src="minha-logo.png" alt="Logo" width="24" height="24">
-    <span>© 2026 Rogério Estumano</span>
-  </footer>
+    function renderizarHistorico(lista) {
+        const area = document.getElementById("areaHistorico");
+        const corpo = document.getElementById("corpoTabelaHistorico");
+        corpo.innerHTML = "";
+        
+        if (empresaSelecionada === 'todas' && lista.length === 0) {
+            area.style.display = "none";
+            return;
+        }
+        area.style.display = "block";
+
+        let total = 0;
+        lista.forEach(h => {
+            total += h.valor;
+            corpo.innerHTML += `
+                <tr>
+                    <td><strong>${h.mes}</strong></td>
+                    <td>${h.vencimento}</td>
+                    <td>${h.dataPagamento}</td>
+                    <td><span class="status-pago">Pago</span></td>
+                    <td>${h.valor.toLocaleString('pt-BR', {style: 'currency', currency: 'BRL'})}</td>
+                </tr>`;
+        });
+        document.getElementById("totalHistorico").innerHTML = `Total acumulado: <span>${total.toLocaleString('pt-BR', {style: 'currency', currency: 'BRL'})}</span>`;
+    }
+
+    function copiar(c) { navigator.clipboard.writeText(c); alert("Código copiado!"); }
+
+    // Iniciar carregamento
+    carregarDados();
+</script>
 </body>
 </html>
