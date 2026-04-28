@@ -1,0 +1,263 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Relatório de Despesas</title>
+    <link rel="stylesheet" href="style.css"> <style>
+        /* Estilos específicos para esta página de Relatório */
+        
+        .report-summary {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 15px;
+            width: 100%;
+            max-width: 800px;
+            margin-bottom: 30px;
+        }
+
+        .summary-item {
+            background: #141414;
+            padding: 20px;
+            border-radius: 12px;
+            border-left: 4px solid #E1C158;
+            text-align: left;
+        }
+
+        .summary-item small { color: #888; font-size: 0.7rem; text-transform: uppercase; letter-spacing: 1px; }
+        .summary-item h3 { color: #fff; font-size: 1.2rem; margin-top: 5px; }
+        .summary-item .valor-negativo { color: #ff4d4d; }
+
+        /* Área de Filtros */
+        .filter-section {
+            background: #1a1a1a;
+            width: 100%;
+            max-width: 800px;
+            padding: 20px;
+            border-radius: 15px;
+            margin-bottom: 20px;
+            border: 1px solid rgba(225, 193, 88, 0.1);
+        }
+
+        .filter-group {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            justify-content: space-between;
+        }
+
+        .filter-group select, .filter-group input {
+            background: #0a0a0a;
+            color: white;
+            border: 1px solid #444;
+            padding: 10px;
+            border-radius: 8px;
+            flex: 1;
+            min-width: 120px;
+            outline: none;
+            cursor: pointer;
+        }
+
+        .filter-group select:focus { border-color: #E1C158; }
+
+        /* Lista de Despesas */
+        .expense-list {
+            width: 100%;
+            max-width: 800px;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .expense-card {
+            background: #141414;
+            padding: 15px 20px;
+            border-radius: 10px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid rgba(255,255,255,0.05);
+        }
+
+        .expense-info h4 { font-size: 0.95rem; margin-bottom: 3px; color: #eee; }
+        .expense-info p { font-size: 0.75rem; color: #666; }
+
+        .expense-value { text-align: right; }
+        .expense-value .price { font-weight: 700; color: #E1C158; display: block; }
+        .expense-value .status { font-size: 0.65rem; padding: 2px 8px; border-radius: 10px; background: #332b00; color: #FFDF73; text-transform: uppercase; }
+
+        @media (max-width: 600px) {
+            .expense-card { flex-direction: column; align-items: flex-start; gap: 10px; }
+            .expense-value { text-align: left; }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="header">
+        <h1>RELATÓRIO DE DESPESAS</h1>
+        <p>MARG DRESS CODE - Análise Consolidada</p>
+    </div>
+
+    <div class="report-summary">
+        <div class="summary-item">
+            <small>Total a Pagar (Aberto/Atrasado)</small>
+            <h3 id="totalPagar" class="valor-negativo">Carregando...</h3>
+        </div>
+        <div class="summary-item">
+            <small>Vencendo Hoje</small>
+            <h3 id="vencendoHoje">Carregando...</h3>
+        </div>
+        <div class="summary-item">
+            <small>Total do Mês Filtrado</small>
+            <h3 id="previstoMes">Carregando...</h3>
+        </div>
+    </div>
+
+    <div class="filter-section">
+        <div class="filter-group">
+            <select id="filtroAno" onchange="aplicarFiltros()">
+                <option value="2026" selected>Ano: 2026</option>
+                <option value="2025">Ano: 2025</option>
+            </select>
+            <select id="filtroMes" onchange="aplicarFiltros()">
+                <option value="">Mês: Todos</option>
+                <option value="04">Abril</option>
+                <option value="05">Maio</option>
+                <option value="12">Dezembro</option>
+            </select>
+            <select id="filtroTipo" onchange="aplicarFiltros()">
+                <option value="">Tipo: Todos</option>
+                <option value="fixo">Custo Fixo</option>
+                <option value="variavel">Variável</option>
+                <option value="imposto">Impostos</option>
+            </select>
+        </div>
+    </div>
+
+    <div class="expense-list" id="listaDespesas"></div>
+
+    <div class="footer-brand">
+        ROGÉRIO ESTUMANO | <b>DATA SCIENCE & TECH</b>
+    </div>
+
+    <a href="https://wa.me/5591985082952" class="whatsapp-float" target="_blank" rel="noopener noreferrer">
+        <svg xmlns="http://www.w3.org/2000/svg" width="35" height="35" fill="currentColor" viewBox="0 0 16 16">
+            <path d="M13.601 2.326A7.854 7.854 0 0 0 7.994 0C3.627 0 .068 3.558.064 7.926c0 1.399.366 2.76 1.057 3.965L0 16l4.204-1.102a7.933 7.933 0 0 0 3.79.965h.004c4.368 0 7.926-3.558 7.93-7.93A7.898 7.898 0 0 0 13.6 2.326zM7.994 14.521a6.573 6.573 0 0 1-3.356-.92l-.24-.144-2.494.654.666-2.433-.156-.251a6.56 6.56 0 0 1-1.007-3.505c0-3.626 2.957-6.584 6.591-6.584a6.56 6.56 0 0 1 4.66 1.931 6.557 6.557 0 0 1 1.928 4.66c-.004 3.639-2.961 6.592-6.592 6.592zm3.615-4.934c-.197-.099-1.17-.578-1.353-.646-.182-.065-.315-.099-.445.099-.133.197-.513.646-.627.775-.114.133-.232.148-.43.05-.197-.1-.836-.308-1.592-.985-.59-.525-.985-1.175-1.103-1.372-.114-.198-.011-.304.088-.403.087-.088.197-.232.296-.346.1-.114.133-.198.198-.33.065-.134.034-.248-.015-.347-.05-.099-.445-1.076-.612-1.47-.16-.389-.323-.335-.445-.34-.114-.005-.247-.007-.38-.007a.729.729 0 0 0-.529.247c-.182.198-.691.677-.691 1.654 0 .977.71 1.916.81 2.049.098.133 1.394 2.132 3.383 2.992.47.205.84.326 1.129.418.475.152.904.129 1.246.08.38-.058 1.171-.48 1.338-.943.164-.464.164-.86.114-.943-.049-.084-.182-.133-.38-.232z"/>
+        </svg>
+    </a>
+
+</body>
+
+
+<script>
+    let despesasDB = [];
+
+    // Função para buscar o JSON
+    async function carregarDados() {
+        try {
+            const resposta = await fetch('despesas.json');
+            despesasDB = await resposta.json();
+            aplicarFiltros(); // Chama a primeira vez para renderizar tudo
+        } catch (erro) {
+            console.error("Erro ao carregar banco de dados:", erro);
+            document.getElementById("listaDespesas").innerHTML = "<p style='color: white;'>Erro ao carregar dados. Use o Live Server.</p>";
+        }
+    }
+
+    // Função que roda sempre que um filtro é alterado
+    function aplicarFiltros() {
+        const anoSelecionado = document.getElementById("filtroAno").value;
+        const mesSelecionado = document.getElementById("filtroMes").value;
+        const tipoSelecionado = document.getElementById("filtroTipo").value;
+
+        // Filtra a lista com base nas seleções
+        let despesasFiltradas = despesasDB.filter(despesa => {
+            const [ano, mes, dia] = despesa.data.split('-');
+            
+            let passaAno = (ano === anoSelecionado);
+            let passaMes = (mesSelecionado === "" || mes === mesSelecionado);
+            let passaTipo = (tipoSelecionado === "" || despesa.tipo === tipoSelecionado);
+
+            return passaAno && passaMes && passaTipo;
+        });
+
+        renderizarCards(despesasFiltradas);
+        calcularResumo(despesasFiltradas);
+    }
+
+    // Pega o número e formata para R$ 0.000,00
+    function formatarMoeda(valor) {
+        return valor.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
+    }
+
+    // Transforma YYYY-MM-DD para DD/MM/YYYY
+    function formatarDataBR(dataIso) {
+        const [ano, mes, dia] = dataIso.split('-');
+        return `${dia}/${mes}/${ano}`;
+    }
+
+    // Desenha os cards na tela
+    function renderizarCards(lista) {
+        const container = document.getElementById("listaDespesas");
+        container.innerHTML = ""; // Limpa a lista atual
+
+        if (lista.length === 0) {
+            container.innerHTML = "<p style='color: #888; text-align: center; padding: 20px;'>Nenhuma despesa encontrada para este filtro.</p>";
+            return;
+        }
+
+        lista.forEach(item => {
+            // Mapeia o tipo para um texto mais amigável
+            let textoTipo = item.tipo === 'fixo' ? 'Custo Fixo' : (item.tipo === 'imposto' ? 'Imposto' : 'Variável');
+            
+            // Define a cor do status
+            let corStatus = item.status === 'Pago' ? '#22c1a6' : (item.status === 'Atrasado' ? '#ff4d4d' : '#FFDF73');
+            let corTextoStatus = item.status === 'Pago' ? '#fff' : (item.status === 'Atrasado' ? '#fff' : '#332b00');
+
+            container.innerHTML += `
+                <div class="expense-card">
+                    <div class="expense-info">
+                        <h4>${item.descricao}</h4>
+                        <p>Vence em: ${formatarDataBR(item.data)} • ${textoTipo}</p>
+                    </div>
+                    <div class="expense-value">
+                        <span class="price">${formatarMoeda(item.valor)}</span>
+                        <span class="status" style="background: ${corStatus}; color: ${corTextoStatus};">${item.status}</span>
+                    </div>
+                </div>
+            `;
+        });
+    }
+
+    // Calcula os valores do topo (O "Dashboard" da CEO)
+    function calcularResumo(lista) {
+        // Pega a data de hoje no formato YYYY-MM-DD para comparar com precisão
+        const dataHojeISO = new Date().toISOString().split('T')[0];
+
+        let somaTotalAberto = 0;
+        let somaVencendoHoje = 0;
+        let somaMesFiltrado = 0;
+
+        lista.forEach(item => {
+            somaMesFiltrado += item.valor; // Soma tudo que está no filtro atual da tela
+
+            if (item.status !== "Pago") {
+                somaTotalAberto += item.valor; // Soma o que ainda deve
+            }
+
+            if (item.data === dataHojeISO && item.status !== "Pago") {
+                somaVencendoHoje += item.valor; // Encontrou boleto de hoje!
+            }
+        });
+
+        document.getElementById("totalPagar").innerText = formatarMoeda(somaTotalAberto);
+        document.getElementById("vencendoHoje").innerText = formatarMoeda(somaVencendoHoje);
+        document.getElementById("previstoMes").innerText = formatarMoeda(somaMesFiltrado);
+    }
+
+    // Dispara a busca inicial quando a página carrega
+    carregarDados();
+</script>
+
+</html>

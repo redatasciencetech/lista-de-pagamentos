@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tela de Boas-Vindas</title>
+    <style>
+        /* Importando uma fonte limpa e moderna do Google Fonts */
+        @import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700&display=swap');
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Montserrat', sans-serif;
+        }
+
+        /* Fundo inspirado na sua paleta escura */
+        body {
+            background-color: #0a0a0a;
+            color: #ffffff;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            overflow: hidden;
+        }
+
+        /* Container principal da animação */
+        .welcome-container {
+            text-align: center;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 30px;
+        }
+
+        /* Estilo e animação da frase de boas-vindas */
+        .welcome-text {
+            font-size: 2.5rem;
+            font-weight: 600;
+            letter-spacing: 2px;
+            /* Degradê dourado inspirado no seu print */
+            background: linear-gradient(90deg, #A67C00 0%, #E1C158 50%, #FFDF73 100%);
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+            opacity: 0;
+            transform: translateY(20px);
+            /* Animação: duração de 1s, ease-out para suavidade */
+            animation: fadeUpIn 1.2s ease-out forwards;
+        }
+
+        /* Container e animação da logo do cliente */
+        .client-logo-wrapper {
+            background: black; /* Leve fundo para destacar a logo */
+            padding: 10px 20px;
+            border-radius: 12px;
+            border: 1px solid goldenrod; /* Borda sutil dourada */
+            opacity: 0;
+            transform: scale(0.9);
+            /* Animação: começa após 1.5s (depois que a frase já apareceu) */
+            animation: fadeInScale 1s ease-out 1.5s forwards;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+        }
+
+        .client-logo-wrapper img {
+            max-width: 250px;
+            height: auto;
+            display: grid;
+        }
+
+        .logo-empresa {
+            background: none;
+            border: none;
+            cursor: pointer;
+        }
+
+
+
+        /* Rodapé sutil com a sua marca */
+        .brand-footer {
+            position: absolute;
+            bottom: 30px;
+            opacity: 0;
+            /* Aparece suavemente no final */
+            animation: fadeIn 1s ease-out 2.5s forwards;
+        }
+
+        .brand-footer p {
+            font-size: 0.8rem;
+            color: #666;
+            letter-spacing: 1px;
+        }
+
+        .brand-footer span {
+            color: #E1C158;
+            font-weight: 700;
+        }
+
+        /* --- KEYFRAMES (Definição das animações) --- */
+        
+        /* Animação de subir e aparecer */
+        @keyframes fadeUpIn {
+            0% {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            100% {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* Animação de surgir e aumentar levemente (efeito de profundidade) */
+        @keyframes fadeInScale {
+            0% {
+                opacity: 0;
+                transform: scale(0.85);
+            }
+            100% {
+                opacity: 1;
+                transform: scale(1);
+            }
+        }
+
+        /* Fade in simples */
+        @keyframes fadeIn {
+            0% { opacity: 0; }
+            100% { opacity: 1; }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="welcome-container">
+        <h1 class="welcome-text">SEJA BEM-VINDO!</h1>
+
+        <div class="client-logo-wrapper">
+            <a href="menu.html" class="logo-empresa">
+            <img src="./img/marg_logo.jpg" alt="Logo da Empresa Cliente">
+            </a>
+        </div>
+
+    </div>
+
+    <div class="brand-footer">
+        <p>POWERED BY <span>ROGÉRIO ESTUMANO</span> | TECH</p>
+    </div>
+
+</body>
+</html>
