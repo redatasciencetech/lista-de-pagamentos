@@ -159,3 +159,37 @@ body {
         grid-template-columns: 1fr;
     }
 }
+
+/* =========================================
+           RESPONSIVIDADE PARA CELULAR (Telas até 768px)
+        ========================================= */
+        @media (max-width: 768px) {
+            /* Deixa a área branca mais compacta */
+            .seletor-empresas {
+                padding: 10px;
+                gap: 12px; /* Reduz o espaço entre as logos */
+            }
+
+            /* Diminui o tamanho das logos das empresas */
+            .logo-empresa {
+                height: 35px !important; /* Força a redução de 60px para 35px */
+            }
+
+            /* Ajusta a logo principal (Rogério) no topo para não quebrar no celular */
+            .logo-rogerio .logo-empresa {
+                height: 50px !important; 
+                margin: 0 !important;
+            }
+
+            .logo-rogerio span {
+                font-size: 18px !important;
+                text-align: center;
+                width: 100%;
+            }
+
+            /* Deixa o botão "Ver Todas" mais proporcional */
+            .btn-todas {
+                padding: 8px 15px;
+                font-size: 14px;
+            }
+        }
