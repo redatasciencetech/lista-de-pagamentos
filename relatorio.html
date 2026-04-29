@@ -84,31 +84,32 @@
 
         <div class="filter-group" style="display: flex; flex-wrap: wrap; gap: 15px; margin-bottom: 15px;">
             <div style="flex: 1; min-width: 150px;">
-                <label style="font-size: 0.75rem; color: #888;">Anos (Selecione vários)</label>
+                <label style="font-size: 0.75rem; color: #888;">Anos</label>
                 <div class="multi-select-container" id="containerAnos"></div>
             </div>
             <div style="flex: 1; min-width: 150px;">
-                <label style="font-size: 0.75rem; color: #888;">Meses (Selecione vários)</label>
+                <label style="font-size: 0.75rem; color: #888;">Meses</label>
                 <div class="multi-select-container" id="containerMeses"></div>
             </div>
         </div>
 
-        <div class="filter-group" style="display: flex; flex-wrap: wrap; gap: 10px;">
-            <select id="filtroMacrogrupo" onchange="aplicarFiltros()" style="flex: 1; min-width: 130px; background: #0a0a0a; color: #fff; border: 1px solid #444; padding: 10px; border-radius: 8px;">
-                <option value="">Macrogrupo: Todos</option>
-            </select>
-            <select id="filtroGrupo" onchange="aplicarFiltros()" style="flex: 1; min-width: 130px; background: #0a0a0a; color: #fff; border: 1px solid #444; padding: 10px; border-radius: 8px;">
-                <option value="">Grupo: Todos</option>
-            </select>
-            <select id="filtroCategoria" onchange="aplicarFiltros()" style="flex: 1; min-width: 130px; background: #0a0a0a; color: #fff; border: 1px solid #444; padding: 10px; border-radius: 8px;">
-                <option value="">Categoria: Todas</option>
-            </select>
-            <select id="filtroStatus" onchange="aplicarFiltros()" style="flex: 1; min-width: 120px; background: #0a0a0a; color: #fff; border: 1px solid #444; padding: 10px; border-radius: 8px;">
-                <option value="">Status: Todos</option>
-                <option value="Pago">Pago</option>
-                <option value="Aguardando">Aguardando</option>
-                <option value="Atrasado">Atrasado</option>
-            </select>
+        <div class="filter-group" style="display: flex; flex-wrap: wrap; gap: 15px;">
+            <div style="flex: 1; min-width: 150px;">
+                <label style="font-size: 0.75rem; color: #888;">Macrogrupos</label>
+                <div class="multi-select-container" id="containerMacrogrupo"></div>
+            </div>
+            <div style="flex: 1; min-width: 150px;">
+                <label style="font-size: 0.75rem; color: #888;">Grupos</label>
+                <div class="multi-select-container" id="containerGrupo"></div>
+            </div>
+            <div style="flex: 1; min-width: 150px;">
+                <label style="font-size: 0.75rem; color: #888;">Categorias</label>
+                <div class="multi-select-container" id="containerCategoria"></div>
+            </div>
+            <div style="flex: 1; min-width: 150px;">
+                <label style="font-size: 0.75rem; color: #888;">Status</label>
+                <div class="multi-select-container" id="containerStatus"></div>
+            </div>
         </div>
     </div>
 
@@ -134,12 +135,11 @@
         const LINK_RECEITAS = "https://docs.google.com/spreadsheets/d/e/2PACX-1vQ3m4D-2Bb4EKd45LuhlBVm3gNqkXidt0KakEdSoX3DTVIRvZ2v9l72x94fOyXu440YDmkZt7y23VGc/pub?gid=458429059&single=true&output=csv";
 
         let despesasDB = [], receitasDB = [], saldosDB = { caixa: 0, banco: 0 };
-        let meuGrafico;
-        let graficoBarras;
+        let meuGrafico, graficoBarras;
 
         window.onload = () => {
             configurarSemanaAtual(new Date());
-            inicializarMultiSelect();
+            inicializarMultiSelectTemporais();
             carregarDadosDaNuvem();
         };
 
@@ -154,52 +154,53 @@
             document.getElementById('dataFim').value = sabado.toISOString().split('T')[0];
         }
 
-        function inicializarMultiSelect() {
+        // Constrói os checkboxes fixos de Anos e Meses
+        function inicializarMultiSelectTemporais() {
             const meses = ['01','02','03','04','05','06','07','08','09','10','11','12'];
             const nomesMeses = ['Jan','Fev','Mar','Abr','Mai','Jun','Jul','Ago','Set','Out','Nov','Dez'];
             const containerM = document.getElementById('containerMeses');
             
-            containerM.innerHTML = `<label class="multi-select-item select-all-divider"><input type="checkbox" onchange="toggleAll('mes', this.checked)"> <b>Selecionar Todos</b></label>`;
+            containerM.innerHTML = `<label class="multi-select-item select-all-divider"><input type="checkbox" onchange="toggleAll('mes', this.checked, true)"> <b>Selecionar Todos</b></label>`;
             meses.forEach((m, i) => {
-                containerM.innerHTML += `<label class="multi-select-item"><input type="checkbox" class="filtro-mes" value="${m}" onchange="onCheckboxChange()"> ${nomesMeses[i]}</label>`;
+                containerM.innerHTML += `<label class="multi-select-item"><input type="checkbox" class="filtro-mes" value="${m}" onchange="onTimeCheckboxChange()"> ${nomesMeses[i]}</label>`;
             });
 
-            const anos = ['2024','2025','2026']; 
+            const anos = ['2024','2025','2026', '2027', '2028', '2029', '2030']; 
             const containerA = document.getElementById('containerAnos');
             
-            containerA.innerHTML = `<label class="multi-select-item select-all-divider"><input type="checkbox" onchange="toggleAll('ano', this.checked)"> <b>Selecionar Todos</b></label>`;
+            containerA.innerHTML = `<label class="multi-select-item select-all-divider"><input type="checkbox" onchange="toggleAll('ano', this.checked, true)"> <b>Selecionar Todos</b></label>`;
             anos.forEach(a => {
-                containerA.innerHTML += `<label class="multi-select-item"><input type="checkbox" class="filtro-ano" value="${a}" onchange="onCheckboxChange()"> ${a}</label>`;
+                containerA.innerHTML += `<label class="multi-select-item"><input type="checkbox" class="filtro-ano" value="${a}" onchange="onTimeCheckboxChange()"> ${a}</label>`;
             });
         }
 
+        // Se usar o calendário, apaga todos os checkboxes (incluindo os novos de categoria)
         function onDataChange() {
             document.querySelectorAll('input[type="checkbox"]').forEach(cb => cb.checked = false);
             aplicarFiltros();
         }
 
-        function onCheckboxChange() {
+        // Se clicar nos meses ou anos, apaga o calendário para fluir a análise inteira
+        function onTimeCheckboxChange() {
             document.getElementById("dataInicio").value = "";
             document.getElementById("dataFim").value = "";
             aplicarFiltros();
         }
 
-        function toggleAll(tipo, isChecked) {
+        // Função universal para o "Selecionar Todos"
+        function toggleAll(tipo, isChecked, isTimeFilter = false) {
             const checkboxes = document.querySelectorAll(`.filtro-${tipo}`);
             checkboxes.forEach(cb => cb.checked = isChecked);
-            document.getElementById("dataInicio").value = "";
-            document.getElementById("dataFim").value = "";
+            
+            if (isTimeFilter) {
+                document.getElementById("dataInicio").value = "";
+                document.getElementById("dataFim").value = "";
+            }
             aplicarFiltros();
         }
 
         function limparFiltros() {
-            document.getElementById("filtroMacrogrupo").value = "";
-            document.getElementById("filtroGrupo").value = "";
-            document.getElementById("filtroCategoria").value = "";
-            document.getElementById("filtroStatus").value = "";
-            
             document.querySelectorAll('input[type="checkbox"]').forEach(cb => cb.checked = false);
-            
             configurarSemanaAtual(new Date());
             aplicarFiltros();
         }
@@ -224,7 +225,7 @@
                     if (nomeConta.includes('banco')) saldosDB.banco = s.saldo;
                 });
 
-                popularFiltrosDinamicos();
+                popularFiltrosDinamicosMultiSelect();
                 aplicarFiltros();
             } catch (e) { console.error(e); }
         }
@@ -243,34 +244,42 @@
             });
         }
 
-        function popularFiltrosDinamicos() {
-            const macros = [...new Set(despesasDB.map(d => d.macrogrupo))].filter(Boolean);
-            const grupos = [...new Set(despesasDB.map(d => d.grupo))].filter(Boolean);
-            const categorias = [...new Set(despesasDB.map(d => d.categoria))].filter(Boolean);
+        // NOVIDADE: Gera as caixas com barras de rolagem e checkboxes para as categorias
+        function popularFiltrosDinamicosMultiSelect() {
+            const macros = [...new Set(despesasDB.map(d => d.macrogrupo))].filter(Boolean).sort();
+            const grupos = [...new Set(despesasDB.map(d => d.grupo))].filter(Boolean).sort();
+            const categorias = [...new Set(despesasDB.map(d => d.categoria))].filter(Boolean).sort();
+            
+            // Pega o status do banco ou usa um padrão
+            const statusDb = [...new Set(despesasDB.map(d => d.status))].filter(Boolean).sort();
+            const statusLista = statusDb.length > 0 ? statusDb : ['Pago', 'Aguardando', 'Atrasado'];
 
-            const selectMacro = document.getElementById('filtroMacrogrupo');
-            selectMacro.innerHTML = '<option value="">Macrogrupo: Todos</option>';
-            macros.sort().forEach(m => selectMacro.innerHTML += `<option value="${m}">${m}</option>`);
+            renderizarCaixaSelecao('containerMacrogrupo', macros, 'macrogrupo');
+            renderizarCaixaSelecao('containerGrupo', grupos, 'grupo');
+            renderizarCaixaSelecao('containerCategoria', categorias, 'categoria');
+            renderizarCaixaSelecao('containerStatus', statusLista, 'status');
+        }
 
-            const selectGrupo = document.getElementById('filtroGrupo');
-            selectGrupo.innerHTML = '<option value="">Grupo: Todos</option>';
-            grupos.sort().forEach(g => selectGrupo.innerHTML += `<option value="${g}">${g}</option>`);
-
-            const selectCat = document.getElementById('filtroCategoria');
-            selectCat.innerHTML = '<option value="">Categoria: Todas</option>';
-            categorias.sort().forEach(c => selectCat.innerHTML += `<option value="${c}">${c}</option>`);
+        function renderizarCaixaSelecao(containerId, items, tipo) {
+            const container = document.getElementById(containerId);
+            container.innerHTML = `<label class="multi-select-item select-all-divider"><input type="checkbox" onchange="toggleAll('${tipo}', this.checked, false)"> <b>Selecionar Todos</b></label>`;
+            items.forEach(item => {
+                // Ao clicar nestes checkboxes, o sistema APENAS aplica o filtro, sem apagar o calendário da semana!
+                container.innerHTML += `<label class="multi-select-item"><input type="checkbox" class="filtro-${tipo}" value="${item}" onchange="aplicarFiltros()"> ${item}</label>`;
+            });
         }
 
         function aplicarFiltros() {
             const dtInicio = document.getElementById("dataInicio").value;
             const dtFim = document.getElementById("dataFim").value;
-            const macro = document.getElementById("filtroMacrogrupo").value;
-            const grupo = document.getElementById("filtroGrupo").value;
-            const categoria = document.getElementById("filtroCategoria").value;
-            const status = document.getElementById("filtroStatus").value;
             
+            // Lê todos os checkboxes marcados e transforma em listas
             const mesesSel = Array.from(document.querySelectorAll('.filtro-mes:checked')).map(i => i.value);
             const anosSel = Array.from(document.querySelectorAll('.filtro-ano:checked')).map(i => i.value);
+            const macroSel = Array.from(document.querySelectorAll('.filtro-macrogrupo:checked')).map(i => i.value);
+            const grupoSel = Array.from(document.querySelectorAll('.filtro-grupo:checked')).map(i => i.value);
+            const catSel = Array.from(document.querySelectorAll('.filtro-categoria:checked')).map(i => i.value);
+            const statusSel = Array.from(document.querySelectorAll('.filtro-status:checked')).map(i => i.value);
 
             let filtradas = despesasDB.filter(d => {
                 if (!d.data) return false;
@@ -279,10 +288,12 @@
                 let pCalendario = (!dtInicio || d.data >= dtInicio) && (!dtFim || d.data <= dtFim);
                 let pAno = anosSel.length === 0 || anosSel.includes(ano);
                 let pMes = mesesSel.length === 0 || mesesSel.includes(mes);
-                let pMacro = !macro || d.macrogrupo === macro;
-                let pGrupo = !grupo || d.grupo === grupo;
-                let pCategoria = !categoria || d.categoria === categoria;
-                let pStatus = !status || d.status === status;
+                
+                // Se a lista estiver vazia (nada marcado), mostra tudo daquela categoria
+                let pMacro = macroSel.length === 0 || macroSel.includes(d.macrogrupo);
+                let pGrupo = grupoSel.length === 0 || grupoSel.includes(d.grupo);
+                let pCategoria = catSel.length === 0 || catSel.includes(d.categoria);
+                let pStatus = statusSel.length === 0 || statusSel.includes(d.status);
                 
                 return pCalendario && pAno && pMes && pMacro && pGrupo && pCategoria && pStatus;
             });
@@ -299,7 +310,7 @@
             renderizarCards(filtradas);
             calcularFinanceiro(filtradas, recFiltradas);
             atualizarGraficoRosca(filtradas);
-            atualizarGraficoBarras(filtradas, recFiltradas); // Chama o novo gráfico
+            atualizarGraficoBarras(filtradas, recFiltradas);
         }
 
         function calcularFinanceiro(desp, rec) {
