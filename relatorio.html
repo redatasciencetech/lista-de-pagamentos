@@ -1,13 +1,15 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Relatório de Despesas | MARG DRESS CODE</title>
+    <title>Dashboard Financeiro | MARG DRESS CODE</title>
     <link rel="stylesheet" href="style.css">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2"></script>
 </head>
+
 <body>
 
     <div class="top-bar">
@@ -15,199 +17,329 @@
             <img src="./img/mylogoR.png" onclick="window.location.href='menu.html'" alt="Logo Rogério">
         </div>
         <div class="page-title">
-            <h1>Relatório de Despesas</h1>
+            <h1>Gestão de Fluxo de Caixa</h1>
             <p>MARG DRESS CODE</p>
         </div>
     </div>
 
-    <div class="report-summary">
-        <div class="summary-item">
-            <small>Total a Pagar</small>
-            <h3 id="totalPagar" class="valor-negativo">Carregando...</h3>
+    <div class="report-summary" style="margin-bottom: 10px;">
+        <div class="summary-item" style="border-left-color: #22c1a6;">
+            <small>Saldo em Caixa (Físico)</small>
+            <h3 id="saldoCaixa">R$ 0,00</h3>
         </div>
-        <div class="summary-item">
-            <small>Vencendo Hoje</small>
-            <h3 id="vencendoHoje">Carregando...</h3>
+        <div class="summary-item" style="border-left-color: #22c1a6;">
+            <small>Saldo no Banco</small>
+            <h3 id="saldoBanco">R$ 0,00</h3>
         </div>
-        <div class="summary-item">
-            <small>Previsto Mês</small>
-            <h3 id="previstoMes">Carregando...</h3>
-        </div>
-    </div>
-
-    <div style="display: flex; flex-wrap: wrap; gap: 20px; width: 90%; max-width: 800px; margin: 20px auto;">
-        <div style="flex: 1; background: #141414; padding: 25px; border-radius: 15px; min-width: 300px; border: 1px solid rgba(225, 193, 88, 0.2); box-shadow: 0 10px 30px rgba(0,0,0,0.5);">
-            <canvas id="graficoCategorias"></canvas>
+        <div class="summary-item" style="border-left-color: #E1C158;">
+            <small>Disponibilidade Total</small>
+            <h3 id="disponibilidadeTotal">R$ 0,00</h3>
         </div>
     </div>
 
-    <div class="filter-section" style="margin: 20px auto;">
-        <div class="filter-group">
-            <select id="filtroAno" onchange="aplicarFiltros()">
-                <option value="2026">Ano: 2026</option>
-                <option value="2025">Ano: 2025</option>
+    <div class="report-summary" style="margin-top: 0;">
+        <div class="summary-item">
+            <small>Receitas no Período (Em breve)</small>
+            <h3 id="receitasPeriodo" style="color: #22c1a6;">R$ 0,00</h3>
+        </div>
+        <div class="summary-item">
+            <small>Despesas no Período</small>
+            <h3 id="despesasPeriodo" class="valor-negativo">R$ 0,00</h3>
+        </div>
+        <div class="summary-item" id="cardProjecao" style="background: #1a1a1a;">
+            <small>Projeção Final (Após pagar contas)</small>
+            <h3 id="projecaoFinal">R$ 0,00</h3>
+        </div>
+    </div>
+
+    <div class="filter-section"
+        style="margin: 20px auto; background: #141414; border: 1px solid rgba(225, 193, 88, 0.2);">
+        <p
+            style="font-size: 0.8rem; color: #E1C158; margin-bottom: 15px; text-transform: uppercase; font-weight: bold;">
+            Filtros de Análise</p>
+
+        <div class="filter-group" style="display: flex; flex-wrap: wrap; gap: 15px; margin-bottom: 15px;">
+            <div style="flex: 1; display: flex; flex-direction: column; gap: 5px; min-width: 120px;">
+                <label style="font-size: 0.75rem; color: #888;">Data Início</label>
+                <input type="date" id="dataInicio" onchange="aplicarFiltros()"
+                    style="background: #0a0a0a; color: #fff; border: 1px solid #444; padding: 10px; border-radius: 8px; width: 100%;">
+            </div>
+
+            <div style="flex: 1; display: flex; flex-direction: column; gap: 5px; min-width: 120px;">
+                <label style="font-size: 0.75rem; color: #888;">Data Fim</label>
+                <input type="date" id="dataFim" onchange="aplicarFiltros()"
+                    style="background: #0a0a0a; color: #fff; border: 1px solid #444; padding: 10px; border-radius: 8px; width: 100%;">
+            </div>
+        </div>
+
+        <div class="filter-group" style="display: flex; flex-wrap: wrap; gap: 10px;">
+            <select id="filtroAno" onchange="sincronizarDatas(); aplicarFiltros();"
+                style="flex: 1; min-width: 100px; background: #0a0a0a; color: #fff; border: 1px solid #444; padding: 10px; border-radius: 8px;">
+                <option value="2026">2026</option>
+                <option value="2025">2025</option>
             </select>
-            <select id="filtroMes" onchange="aplicarFiltros()">
-                <option value="">Mês: Todos</option>
-                <option value="04">Abril</option>
-                <option value="05">Maio</option>
-                <option value="12">Dezembro</option>
+
+            <select id="filtroMes" onchange="sincronizarDatas(); aplicarFiltros();"
+                style="flex: 1; min-width: 100px; background: #0a0a0a; color: #fff; border: 1px solid #444; padding: 10px; border-radius: 8px;">
+                <option value="">Mês: Atual</option>
+                <option value="01">Jan</option>
+                <option value="02">Fev</option>
+                <option value="03">Mar</option>
+                <option value="04">Abr</option>
+                <option value="05">Mai</option>
+                <option value="06">Jun</option>
+                <option value="07">Jul</option>
+                <option value="08">Ago</option>
+                <option value="09">Set</option>
+                <option value="10">Out</option>
+                <option value="11">Nov</option>
+                <option value="12">Dez</option>
             </select>
-            <select id="filtroTipo" onchange="aplicarFiltros()">
+
+            <select id="filtroTipo" onchange="aplicarFiltros()"
+                style="flex: 1; min-width: 120px; background: #0a0a0a; color: #fff; border: 1px solid #444; padding: 10px; border-radius: 8px;">
                 <option value="">Tipo: Todos</option>
                 <option value="fixo">Custo Fixo</option>
                 <option value="variavel">Variável</option>
                 <option value="imposto">Impostos</option>
+                <option value="sarima">Cartões Sarima</option>
+            </select>
+
+            <select id="filtroStatus" onchange="aplicarFiltros()"
+                style="flex: 1; min-width: 120px; background: #0a0a0a; color: #fff; border: 1px solid #444; padding: 10px; border-radius: 8px;">
+                <option value="">Status: Todos</option>
+                <option value="Pago">Pago</option>
+                <option value="Aguardando">Aguardando</option>
+                <option value="Atrasado">Atrasado</option>
             </select>
         </div>
     </div>
 
+
     <div class="expense-list" id="listaDespesas" style="margin: 0 auto;"></div>
+
+    <div style="display: flex; flex-wrap: wrap; gap: 20px; width: 90%; max-width: 800px; margin: 20px auto;">
+        <div
+            style="flex: 1; background: #141414; padding: 25px; border-radius: 15px; min-width: 300px; border: 1px solid rgba(225, 193, 88, 0.2); box-shadow: 0 10px 30px rgba(0,0,0,0.5);">
+            <canvas id="graficoCategorias"></canvas>
+        </div>
+    </div>
+
+
 
     <div class="footer-brand">
         ROGÉRIO ESTUMANO | <b>DATA SCIENCE & TECH</b> © 2026
     </div>
 
+    <a href="https://wa.me/5591985082952" class="whatsapp-float" target="_blank" rel="noopener noreferrer"
+        aria-label="Fale conosco no WhatsApp">
+        <svg xmlns="http://www.w3.org/2000/svg" width="35" height="35" fill="currentColor" viewBox="0 0 16 16">
+            <path
+                d="M13.601 2.326A7.854 7.854 0 0 0 7.994 0C3.627 0 .068 3.558.064 7.926c0 1.399.366 2.76 1.057 3.965L0 16l4.204-1.102a7.933 7.933 0 0 0 3.79.965h.004c4.368 0 7.926-3.558 7.93-7.93A7.898 7.898 0 0 0 13.6 2.326zM7.994 14.521a6.573 6.573 0 0 1-3.356-.92l-.24-.144-2.494.654.666-2.433-.156-.251a6.56 6.56 0 0 1-1.007-3.505c0-3.626 2.957-6.584 6.591-6.584a6.56 6.56 0 0 1 4.66 1.931 6.557 6.557 0 0 1 1.928 4.66c-.004 3.639-2.961 6.592-6.592 6.592zm3.615-4.934c-.197-.099-1.17-.578-1.353-.646-.182-.065-.315-.099-.445.099-.133.197-.513.646-.627.775-.114.133-.232.148-.43.05-.197-.1-.836-.308-1.592-.985-.59-.525-.985-1.175-1.103-1.372-.114-.198-.011-.304.088-.403.087-.088.197-.232.296-.346.1-.114.133-.198.198-.33.065-.134.034-.248-.015-.347-.05-.099-.445-1.076-.612-1.47-.16-.389-.323-.335-.445-.34-.114-.005-.247-.007-.38-.007a.729.729 0 0 0-.529.247c-.182.198-.691.677-.691 1.654 0 .977.71 1.916.81 2.049.098.133 1.394 2.132 3.383 2.992.47.205.84.326 1.129.418.475.152.904.129 1.246.08.38-.058 1.171-.48 1.338-.943.164-.464.164-.86.114-.943-.049-.084-.182-.133-.38-.232z" />
+        </svg>
+    </a>
+
     <script>
+        // SEUS LINKS DO GOOGLE SHEETS
+        const LINK_DESPESAS = "https://docs.google.com/spreadsheets/d/e/2PACX-1vQ3m4D-2Bb4EKd45LuhlBVm3gNqkXidt0KakEdSoX3DTVIRvZ2v9l72x94fOyXu440YDmkZt7y23VGc/pub?gid=0&single=true&output=csv";
+
+        // COLE AQUI O NOVO LINK DA SUA ABA DE SALDOS
+        const LINK_SALDOS = "https://docs.google.com/spreadsheets/d/e/2PACX-1vQ3m4D-2Bb4EKd45LuhlBVm3gNqkXidt0KakEdSoX3DTVIRvZ2v9l72x94fOyXu440YDmkZt7y23VGc/pub?gid=1250042389&single=true&output=csv";
+
         let despesasDB = [];
+        let saldosDB = { caixa: 0, banco: 0 };
         let meuGrafico;
 
-        async function carregarDados() {
-            try {
-                const resposta = await fetch('despesas.json');
-                despesasDB = await resposta.json();
-                aplicarFiltros();
-            } catch (erro) {
-                console.error("Erro:", erro);
-                document.getElementById("listaDespesas").innerHTML = "<p style='color: white;'>Erro ao carregar dados.</p>";
+        // INICIA O SISTEMA
+        window.onload = () => {
+            configurarSemanaAtual(new Date());
+            carregarDadosDaNuvem();
+        };
+
+        function configurarSemanaAtual(referencia) {
+            const diaDaSemana = referencia.getDay();
+            const domingo = new Date(referencia);
+            domingo.setDate(referencia.getDate() - diaDaSemana);
+            const sabado = new Date(referencia);
+            sabado.setDate(referencia.getDate() + (6 - diaDaSemana));
+
+            document.getElementById('dataInicio').value = domingo.toISOString().split('T')[0];
+            document.getElementById('dataFim').value = sabado.toISOString().split('T')[0];
+        }
+
+        function sincronizarDatas() {
+            const ano = document.getElementById("filtroAno").value;
+            const mes = document.getElementById("filtroMes").value;
+
+            if (mes !== "") {
+                const ultimoDia = new Date(ano, parseInt(mes), 0).getDate();
+                document.getElementById('dataInicio').value = `${ano}-${mes}-01`;
+                document.getElementById('dataFim').value = `${ano}-${mes}-${ultimoDia.toString().padStart(2, '0')}`;
+            } else {
+                document.getElementById('dataInicio').value = `${ano}-01-01`;
+                document.getElementById('dataFim').value = `${ano}-12-31`;
             }
         }
 
+        // CARREGA DESPESAS E SALDOS AO MESMO TEMPO
+        async function carregarDadosDaNuvem() {
+            try {
+                const cacheBuster = `&t=${new Date().getTime()}`;
+
+                // Faz a requisição para os dois links simultaneamente para ser mais rápido
+                const [respDespesas, respSaldos] = await Promise.all([
+                    fetch(LINK_DESPESAS + cacheBuster).catch(() => null),
+                    fetch(LINK_SALDOS + cacheBuster).catch(() => null)
+                ]);
+
+                if (respDespesas) {
+                    despesasDB = converterCsvParaJson(await respDespesas.text());
+                }
+
+                if (respSaldos) {
+                    const saldosCSV = converterCsvParaJson(await respSaldos.text());
+                    // Mapeia o resultado para o nosso banco de saldos
+                    saldosDB = { caixa: 0, banco: 0 };
+                    saldosCSV.forEach(item => {
+                        const nomeConta = (item.conta || "").toLowerCase();
+                        const valor = parseFloat(item.saldo) || 0;
+                        if (nomeConta.includes("caixa")) saldosDB.caixa += valor;
+                        if (nomeConta.includes("banco")) saldosDB.banco += valor;
+                    });
+                }
+
+                aplicarFiltros();
+            } catch (erro) {
+                console.error("Erro geral de carregamento:", erro);
+            }
+        }
+
+        function converterCsvParaJson(csv) {
+            const linhas = csv.split('\n');
+            const resultado = [];
+            if (!linhas || linhas.length < 2) return resultado;
+            const cabecalhos = linhas[0].split(',').map(h => h.trim().toLowerCase().replace(/"/g, ''));
+
+            for (let i = 1; i < linhas.length; i++) {
+                if (!linhas[i] || linhas[i].trim() === "") continue;
+                const colunas = linhas[i].split(',').map(c => c.trim().replace(/"/g, ''));
+                const obj = {};
+                cabecalhos.forEach((header, index) => {
+                    let valor = colunas[index];
+                    if (header === 'valor' || header === 'saldo') valor = parseFloat(valor) || 0;
+                    obj[header] = valor;
+                });
+                resultado.push(obj);
+            }
+            return resultado;
+        }
+
         function aplicarFiltros() {
-            const anoSelecionado = document.getElementById("filtroAno").value;
-            const mesSelecionado = document.getElementById("filtroMes").value;
-            const tipoSelecionado = document.getElementById("filtroTipo").value;
+            const dtInicio = document.getElementById("dataInicio").value;
+            const dtFim = document.getElementById("dataFim").value;
+            const anoSel = document.getElementById("filtroAno").value;
+            const mesSel = document.getElementById("filtroMes").value;
+            const tipoSel = document.getElementById("filtroTipo").value;
+            const statusSel = document.getElementById("filtroStatus").value;
 
             let despesasFiltradas = despesasDB.filter(despesa => {
-                const [ano, mes, dia] = despesa.data.split('-');
-                let passaAno = (ano === anoSelecionado);
-                let passaMes = (mesSelecionado === "" || mes === mesSelecionado);
-                let passaTipo = (tipoSelecionado === "" || despesa.tipo === tipoSelecionado);
-                return passaAno && passaMes && passaTipo;
+                if (!despesa.data) return false;
+                const [anoD, mesD] = despesa.data.split('-');
+
+                let passaCalendario = (!dtInicio || despesa.data >= dtInicio) && (!dtFim || despesa.data <= dtFim);
+                let passaAno = (anoSel === "" || anoD === anoSel);
+                let passaMes = (mesSel === "" || mesD === mesSel);
+                let passaTipo = (tipoSel === "" || despesa.tipo === tipoSel);
+                let passaStatus = (statusSel === "" || despesa.status === statusSel);
+
+                return passaCalendario && passaAno && passaMes && passaTipo && passaStatus;
             });
 
             renderizarCards(despesasFiltradas);
-            calcularResumo(despesasFiltradas);
+            calcularFinanceiro(despesasFiltradas);
             atualizarGrafico(despesasFiltradas);
+        }
+
+        function calcularFinanceiro(despesas) {
+            // Conta apenas as despesas que não estão pagas para a projeção de saída
+            const totalDespAbertas = despesas.reduce((s, d) => (d.status !== 'Pago') ? s + d.valor : s, 0);
+
+            const dispTotal = saldosDB.caixa + saldosDB.banco;
+
+            // Projeção = O que tem hoje - O que falta pagar no período selecionado
+            const projecao = dispTotal - totalDespAbertas;
+
+            // Atualiza a interface
+            document.getElementById("despesasPeriodo").innerText = formatarMoeda(totalDespAbertas);
+            document.getElementById("saldoCaixa").innerText = formatarMoeda(saldosDB.caixa);
+            document.getElementById("saldoBanco").innerText = formatarMoeda(saldosDB.banco);
+            document.getElementById("disponibilidadeTotal").innerText = formatarMoeda(dispTotal);
+            document.getElementById("projecaoFinal").innerText = formatarMoeda(projecao);
+
+            // Feedback visual de risco (Vermelho se faltar dinheiro)
+            const cardProj = document.getElementById("cardProjecao");
+            cardProj.style.borderLeft = projecao < 0 ? "4px solid #ff4d4d" : "4px solid #22c1a6";
+            document.getElementById("projecaoFinal").style.color = projecao < 0 ? "#ff4d4d" : "#fff";
         }
 
         function atualizarGrafico(lista) {
             const ctx = document.getElementById('graficoCategorias').getContext('2d');
-            
             const totais = lista.reduce((acc, item) => {
                 acc[item.tipo] = (acc[item.tipo] || 0) + item.valor;
                 return acc;
             }, {});
 
             const totalSoma = Object.values(totais).reduce((a, b) => a + b, 0);
-
             if (meuGrafico) meuGrafico.destroy();
 
             meuGrafico = new Chart(ctx, {
                 type: 'doughnut',
                 plugins: [ChartDataLabels],
                 data: {
-                    labels: ['Fixo', 'Variável', 'Imposto'],
+                    labels: ['Fixo', 'Variável', 'Imposto', 'Sarima'],
                     datasets: [{
-                        data: [totais.fixo || 0, totais.variavel || 0, totais.imposto || 0],
-                        backgroundColor: ['#E1C158', '#A67C00', '#444444'],
+                        data: [totais.fixo || 0, totais.variavel || 0, totais.imposto || 0, totais.sarima || 0],
+                        backgroundColor: ['#E1C158', '#A67C00', '#444444', 'gray'],
                         borderColor: '#141414',
                         borderWidth: 4
                     }]
                 },
                 options: {
                     responsive: true,
-                    maintainAspectRatio: true,
                     plugins: {
-                        legend: { 
-                            position: 'bottom', 
-                            labels: { color: '#fff', font: { family: 'Montserrat', size: 12 } } 
-                        },
-                        title: { 
-                            display: true, 
-                            text: 'DISTRIBUIÇÃO PERCENTUAL', 
-                            color: '#E1C158', 
-                            font: { size: 16, weight: 'bold', family: 'Montserrat' },
-                            padding: { bottom: 20 }
-                        },
+                        legend: { position: 'bottom', labels: { color: '#fff' } },
+                        title: { display: true, text: 'DISTRIBUIÇÃO PERCENTUAL', color: '#E1C158', font: { size: 16, weight: 'bold' } },
                         datalabels: {
                             color: '#fff',
-                            font: { weight: 'bold', size: 14 },
-                            formatter: (value) => {
-                                if (!value || value === 0) return null;
-                                return ((value / totalSoma) * 100).toFixed(1) + "%";
-                            }
+                            formatter: (val) => (!val || totalSoma === 0) ? null : ((val / totalSoma) * 100).toFixed(1) + "%"
                         }
                     },
-                    cutout: '60%' // Deixa o furo da rosca mais elegante
+                    cutout: '60%'
                 }
             });
         }
 
-        function formatarMoeda(valor) {
-            return valor.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
-        }
-
-        function formatarDataBR(dataIso) {
-            const [ano, mes, dia] = dataIso.split('-');
-            return `${dia}/${mes}/${ano}`;
-        }
+        function formatarMoeda(v) { return v.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' }); }
 
         function renderizarCards(lista) {
             const container = document.getElementById("listaDespesas");
-            container.innerHTML = "";
-            if (lista.length === 0) {
-                container.innerHTML = "<p style='color: #888; text-align: center; padding: 20px;'>Nenhuma despesa encontrada.</p>";
-                return;
-            }
+            container.innerHTML = lista.length === 0 ? "<p style='color:#888;text-align:center;padding:20px;'>Nenhuma despesa para este filtro.</p>" : "";
             lista.forEach(item => {
-                let textoTipo = item.tipo === 'fixo' ? 'Custo Fixo' : (item.tipo === 'imposto' ? 'Imposto' : 'Variável');
                 let corStatus = item.status === 'Pago' ? '#22c1a6' : (item.status === 'Atrasado' ? '#ff4d4d' : '#FFDF73');
-                let corTextoStatus = item.status === 'Pago' ? '#fff' : (item.status === 'Atrasado' ? '#fff' : '#332b00');
-
                 container.innerHTML += `
                     <div class="expense-card">
                         <div class="expense-info">
                             <h4>${item.descricao}</h4>
-                            <p>Vence em: ${formatarDataBR(item.data)} • ${textoTipo}</p>
+                            <p>${item.data.split('-').reverse().join('/')} • ${item.tipo}</p>
                         </div>
                         <div class="expense-value">
                             <span class="price">${formatarMoeda(item.valor)}</span>
-                            <span class="status" style="background: ${corStatus}; color: ${corTextoStatus};">${item.status}</span>
+                            <span class="status" style="background:${corStatus}; color:#111; font-weight:bold;">${item.status}</span>
                         </div>
-                    </div>
-                `;
+                    </div>`;
             });
         }
-
-        function calcularResumo(lista) {
-            const dataHojeISO = new Date().toISOString().split('T')[0];
-            let somaTotalAberto = 0;
-            let somaVencendoHoje = 0;
-            let somaMesFiltrado = 0;
-
-            lista.forEach(item => {
-                somaMesFiltrado += item.valor;
-                if (item.status !== "Pago") somaTotalAberto += item.valor;
-                if (item.data === dataHojeISO && item.status !== "Pago") somaVencendoHoje += item.valor;
-            });
-
-            document.getElementById("totalPagar").innerText = formatarMoeda(somaTotalAberto);
-            document.getElementById("vencendoHoje").innerText = formatarMoeda(somaVencendoHoje);
-            document.getElementById("previstoMes").innerText = formatarMoeda(somaMesFiltrado);
-        }
-
-        carregarDados();
     </script>
 </body>
+
 </html>
