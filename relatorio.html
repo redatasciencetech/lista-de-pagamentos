@@ -1,6 +1,5 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
-
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -8,8 +7,22 @@
     <link rel="stylesheet" href="style.css">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2"></script>
+    <style>
+        .multi-select-container {
+            background: #0a0a0a;
+            border: 1px solid #444;
+            border-radius: 8px;
+            padding: 10px;
+            max-height: 120px;
+            overflow-y: auto;
+            color: white;
+            font-size: 0.8rem;
+        }
+        .multi-select-item { display: flex; align-items: center; gap: 8px; margin-bottom: 5px; cursor: pointer; }
+        .multi-select-item input { cursor: pointer; accent-color: #E1C158; }
+        .select-all-divider { border-bottom: 1px solid #333; margin-bottom: 8px; padding-bottom: 5px; }
+    </style>
 </head>
-
 <body>
 
     <div class="top-bar">
@@ -24,7 +37,7 @@
 
     <div class="report-summary" style="margin-bottom: 10px;">
         <div class="summary-item" style="border-left-color: #22c1a6;">
-            <small>Saldo em Caixa (Físico)</small>
+            <small>Saldo em Caixa</small>
             <h3 id="saldoCaixa">R$ 0,00</h3>
         </div>
         <div class="summary-item" style="border-left-color: #22c1a6;">
@@ -32,14 +45,14 @@
             <h3 id="saldoBanco">R$ 0,00</h3>
         </div>
         <div class="summary-item" style="border-left-color: #E1C158;">
-            <small>Disponibilidade Total</small>
+            <small>Disponibilidade Atual</small>
             <h3 id="disponibilidadeTotal">R$ 0,00</h3>
         </div>
     </div>
 
     <div class="report-summary" style="margin-top: 0;">
-        <div class="summary-item">
-            <small>Receitas no Período (Em breve)</small>
+        <div class="summary-item" style="border-left-color: #A67C00;">
+            <small>Receitas no Período</small>
             <h3 id="receitasPeriodo" style="color: #22c1a6;">R$ 0,00</h3>
         </div>
         <div class="summary-item">
@@ -47,66 +60,50 @@
             <h3 id="despesasPeriodo" class="valor-negativo">R$ 0,00</h3>
         </div>
         <div class="summary-item" id="cardProjecao" style="background: #1a1a1a;">
-            <small>Projeção Final (Após pagar contas)</small>
+            <small>Projeção Final do Período</small>
             <h3 id="projecaoFinal">R$ 0,00</h3>
         </div>
     </div>
 
-    <div class="filter-section"
-        style="margin: 20px auto; background: #141414; border: 1px solid rgba(225, 193, 88, 0.2);">
-        <p
-            style="font-size: 0.8rem; color: #E1C158; margin-bottom: 15px; text-transform: uppercase; font-weight: bold;">
-            Filtros de Análise</p>
-
+    <div class="filter-section" style="margin: 20px auto; background: #141414; border: 1px solid rgba(225, 193, 88, 0.2);">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
+            <p style="font-size: 0.8rem; color: #E1C158; text-transform: uppercase; font-weight: bold; margin: 0;">Filtros de Análise Detalhada</p>
+            <button onclick="limparFiltros()" style="background: #E1C158; color: #000; border: none; padding: 6px 12px; border-radius: 6px; font-weight: bold; cursor: pointer; font-size: 0.75rem;">🧹 Limpar Filtros</button>
+        </div>
+        
         <div class="filter-group" style="display: flex; flex-wrap: wrap; gap: 15px; margin-bottom: 15px;">
             <div style="flex: 1; display: flex; flex-direction: column; gap: 5px; min-width: 120px;">
                 <label style="font-size: 0.75rem; color: #888;">Data Início</label>
-                <input type="date" id="dataInicio" onchange="aplicarFiltros()"
-                    style="background: #0a0a0a; color: #fff; border: 1px solid #444; padding: 10px; border-radius: 8px; width: 100%;">
+                <input type="date" id="dataInicio" onchange="onDataChange()" style="background: #0a0a0a; color: #fff; border: 1px solid #444; padding: 10px; border-radius: 8px;">
             </div>
-
             <div style="flex: 1; display: flex; flex-direction: column; gap: 5px; min-width: 120px;">
                 <label style="font-size: 0.75rem; color: #888;">Data Fim</label>
-                <input type="date" id="dataFim" onchange="aplicarFiltros()"
-                    style="background: #0a0a0a; color: #fff; border: 1px solid #444; padding: 10px; border-radius: 8px; width: 100%;">
+                <input type="date" id="dataFim" onchange="onDataChange()" style="background: #0a0a0a; color: #fff; border: 1px solid #444; padding: 10px; border-radius: 8px;">
+            </div>
+        </div>
+
+        <div class="filter-group" style="display: flex; flex-wrap: wrap; gap: 15px; margin-bottom: 15px;">
+            <div style="flex: 1; min-width: 150px;">
+                <label style="font-size: 0.75rem; color: #888;">Anos (Selecione vários)</label>
+                <div class="multi-select-container" id="containerAnos"></div>
+            </div>
+            <div style="flex: 1; min-width: 150px;">
+                <label style="font-size: 0.75rem; color: #888;">Meses (Selecione vários)</label>
+                <div class="multi-select-container" id="containerMeses"></div>
             </div>
         </div>
 
         <div class="filter-group" style="display: flex; flex-wrap: wrap; gap: 10px;">
-            <select id="filtroAno" onchange="sincronizarDatas(); aplicarFiltros();"
-                style="flex: 1; min-width: 100px; background: #0a0a0a; color: #fff; border: 1px solid #444; padding: 10px; border-radius: 8px;">
-                <option value="2026">2026</option>
-                <option value="2025">2025</option>
+            <select id="filtroMacrogrupo" onchange="aplicarFiltros()" style="flex: 1; min-width: 130px; background: #0a0a0a; color: #fff; border: 1px solid #444; padding: 10px; border-radius: 8px;">
+                <option value="">Macrogrupo: Todos</option>
             </select>
-
-            <select id="filtroMes" onchange="sincronizarDatas(); aplicarFiltros();"
-                style="flex: 1; min-width: 100px; background: #0a0a0a; color: #fff; border: 1px solid #444; padding: 10px; border-radius: 8px;">
-                <option value="">Mês: Atual</option>
-                <option value="01">Jan</option>
-                <option value="02">Fev</option>
-                <option value="03">Mar</option>
-                <option value="04">Abr</option>
-                <option value="05">Mai</option>
-                <option value="06">Jun</option>
-                <option value="07">Jul</option>
-                <option value="08">Ago</option>
-                <option value="09">Set</option>
-                <option value="10">Out</option>
-                <option value="11">Nov</option>
-                <option value="12">Dez</option>
+            <select id="filtroGrupo" onchange="aplicarFiltros()" style="flex: 1; min-width: 130px; background: #0a0a0a; color: #fff; border: 1px solid #444; padding: 10px; border-radius: 8px;">
+                <option value="">Grupo: Todos</option>
             </select>
-
-            <select id="filtroTipo" onchange="aplicarFiltros()"
-                style="flex: 1; min-width: 120px; background: #0a0a0a; color: #fff; border: 1px solid #444; padding: 10px; border-radius: 8px;">
-                <option value="">Tipo: Todos</option>
-                <option value="fixo">Custo Fixo</option>
-                <option value="variavel">Variável</option>
-                <option value="imposto">Impostos</option>
-                <option value="sarima">Cartões Sarima</option>
+            <select id="filtroCategoria" onchange="aplicarFiltros()" style="flex: 1; min-width: 130px; background: #0a0a0a; color: #fff; border: 1px solid #444; padding: 10px; border-radius: 8px;">
+                <option value="">Categoria: Todas</option>
             </select>
-
-            <select id="filtroStatus" onchange="aplicarFiltros()"
-                style="flex: 1; min-width: 120px; background: #0a0a0a; color: #fff; border: 1px solid #444; padding: 10px; border-radius: 8px;">
+            <select id="filtroStatus" onchange="aplicarFiltros()" style="flex: 1; min-width: 120px; background: #0a0a0a; color: #fff; border: 1px solid #444; padding: 10px; border-radius: 8px;">
                 <option value="">Status: Todos</option>
                 <option value="Pago">Pago</option>
                 <option value="Aguardando">Aguardando</option>
@@ -115,44 +112,34 @@
         </div>
     </div>
 
+    <div style="display: flex; flex-wrap: wrap; justify-content: center; gap: 20px; width: 95%; margin: 20px auto;">
+        <div style="flex: 1; background: #141414; padding: 25px; border-radius: 15px; min-width: 350px; max-width: 600px; border: 1px solid rgba(225, 193, 88, 0.2);">
+            <canvas id="graficoEvolucao"></canvas>
+        </div>
 
-    <div class="expense-list" id="listaDespesas" style="margin: 0 auto;"></div>
-
-    <div style="display: flex; flex-wrap: wrap; gap: 20px; width: 90%; max-width: 800px; margin: 20px auto;">
-        <div
-            style="flex: 1; background: #141414; padding: 25px; border-radius: 15px; min-width: 300px; border: 1px solid rgba(225, 193, 88, 0.2); box-shadow: 0 10px 30px rgba(0,0,0,0.5);">
+        <div style="flex: 1; background: #141414; padding: 25px; border-radius: 15px; min-width: 300px; max-width: 450px; border: 1px solid rgba(225, 193, 88, 0.2);">
             <canvas id="graficoCategorias"></canvas>
         </div>
     </div>
 
-
+    <div class="expense-list" id="listaDespesas" style="margin: 0 auto; padding-bottom: 40px;"></div>
 
     <div class="footer-brand">
         ROGÉRIO ESTUMANO | <b>DATA SCIENCE & TECH</b> © 2026
     </div>
 
-    <a href="https://wa.me/5591985082952" class="whatsapp-float" target="_blank" rel="noopener noreferrer"
-        aria-label="Fale conosco no WhatsApp">
-        <svg xmlns="http://www.w3.org/2000/svg" width="35" height="35" fill="currentColor" viewBox="0 0 16 16">
-            <path
-                d="M13.601 2.326A7.854 7.854 0 0 0 7.994 0C3.627 0 .068 3.558.064 7.926c0 1.399.366 2.76 1.057 3.965L0 16l4.204-1.102a7.933 7.933 0 0 0 3.79.965h.004c4.368 0 7.926-3.558 7.93-7.93A7.898 7.898 0 0 0 13.6 2.326zM7.994 14.521a6.573 6.573 0 0 1-3.356-.92l-.24-.144-2.494.654.666-2.433-.156-.251a6.56 6.56 0 0 1-1.007-3.505c0-3.626 2.957-6.584 6.591-6.584a6.56 6.56 0 0 1 4.66 1.931 6.557 6.557 0 0 1 1.928 4.66c-.004 3.639-2.961 6.592-6.592 6.592zm3.615-4.934c-.197-.099-1.17-.578-1.353-.646-.182-.065-.315-.099-.445.099-.133.197-.513.646-.627.775-.114.133-.232.148-.43.05-.197-.1-.836-.308-1.592-.985-.59-.525-.985-1.175-1.103-1.372-.114-.198-.011-.304.088-.403.087-.088.197-.232.296-.346.1-.114.133-.198.198-.33.065-.134.034-.248-.015-.347-.05-.099-.445-1.076-.612-1.47-.16-.389-.323-.335-.445-.34-.114-.005-.247-.007-.38-.007a.729.729 0 0 0-.529.247c-.182.198-.691.677-.691 1.654 0 .977.71 1.916.81 2.049.098.133 1.394 2.132 3.383 2.992.47.205.84.326 1.129.418.475.152.904.129 1.246.08.38-.058 1.171-.48 1.338-.943.164-.464.164-.86.114-.943-.049-.084-.182-.133-.38-.232z" />
-        </svg>
-    </a>
-
     <script>
-        // SEUS LINKS DO GOOGLE SHEETS
         const LINK_DESPESAS = "https://docs.google.com/spreadsheets/d/e/2PACX-1vQ3m4D-2Bb4EKd45LuhlBVm3gNqkXidt0KakEdSoX3DTVIRvZ2v9l72x94fOyXu440YDmkZt7y23VGc/pub?gid=0&single=true&output=csv";
+        const LINK_SALDOS = "https://docs.google.com/spreadsheets/d/e/2PACX-1vQ3m4D-2Bb4EKd45LuhlBVm3gNqkXidt0KakEdSoX3DTVIRvZ2v9l72x94fOyXu440YDmkZt7y23VGc/pub?gid=1250042389&single=true&output=csv"; 
+        const LINK_RECEITAS = "https://docs.google.com/spreadsheets/d/e/2PACX-1vQ3m4D-2Bb4EKd45LuhlBVm3gNqkXidt0KakEdSoX3DTVIRvZ2v9l72x94fOyXu440YDmkZt7y23VGc/pub?gid=458429059&single=true&output=csv";
 
-        // COLE AQUI O NOVO LINK DA SUA ABA DE SALDOS
-        const LINK_SALDOS = "https://docs.google.com/spreadsheets/d/e/2PACX-1vQ3m4D-2Bb4EKd45LuhlBVm3gNqkXidt0KakEdSoX3DTVIRvZ2v9l72x94fOyXu440YDmkZt7y23VGc/pub?gid=1250042389&single=true&output=csv";
-
-        let despesasDB = [];
-        let saldosDB = { caixa: 0, banco: 0 };
+        let despesasDB = [], receitasDB = [], saldosDB = { caixa: 0, banco: 0 };
         let meuGrafico;
+        let graficoBarras;
 
-        // INICIA O SISTEMA
         window.onload = () => {
             configurarSemanaAtual(new Date());
+            inicializarMultiSelect();
             carregarDadosDaNuvem();
         };
 
@@ -162,144 +149,194 @@
             domingo.setDate(referencia.getDate() - diaDaSemana);
             const sabado = new Date(referencia);
             sabado.setDate(referencia.getDate() + (6 - diaDaSemana));
-
+            
             document.getElementById('dataInicio').value = domingo.toISOString().split('T')[0];
             document.getElementById('dataFim').value = sabado.toISOString().split('T')[0];
         }
 
-        function sincronizarDatas() {
-            const ano = document.getElementById("filtroAno").value;
-            const mes = document.getElementById("filtroMes").value;
+        function inicializarMultiSelect() {
+            const meses = ['01','02','03','04','05','06','07','08','09','10','11','12'];
+            const nomesMeses = ['Jan','Fev','Mar','Abr','Mai','Jun','Jul','Ago','Set','Out','Nov','Dez'];
+            const containerM = document.getElementById('containerMeses');
+            
+            containerM.innerHTML = `<label class="multi-select-item select-all-divider"><input type="checkbox" onchange="toggleAll('mes', this.checked)"> <b>Selecionar Todos</b></label>`;
+            meses.forEach((m, i) => {
+                containerM.innerHTML += `<label class="multi-select-item"><input type="checkbox" class="filtro-mes" value="${m}" onchange="onCheckboxChange()"> ${nomesMeses[i]}</label>`;
+            });
 
-            if (mes !== "") {
-                const ultimoDia = new Date(ano, parseInt(mes), 0).getDate();
-                document.getElementById('dataInicio').value = `${ano}-${mes}-01`;
-                document.getElementById('dataFim').value = `${ano}-${mes}-${ultimoDia.toString().padStart(2, '0')}`;
-            } else {
-                document.getElementById('dataInicio').value = `${ano}-01-01`;
-                document.getElementById('dataFim').value = `${ano}-12-31`;
-            }
+            const anos = ['2024','2025','2026']; 
+            const containerA = document.getElementById('containerAnos');
+            
+            containerA.innerHTML = `<label class="multi-select-item select-all-divider"><input type="checkbox" onchange="toggleAll('ano', this.checked)"> <b>Selecionar Todos</b></label>`;
+            anos.forEach(a => {
+                containerA.innerHTML += `<label class="multi-select-item"><input type="checkbox" class="filtro-ano" value="${a}" onchange="onCheckboxChange()"> ${a}</label>`;
+            });
         }
 
-        // CARREGA DESPESAS E SALDOS AO MESMO TEMPO
+        function onDataChange() {
+            document.querySelectorAll('input[type="checkbox"]').forEach(cb => cb.checked = false);
+            aplicarFiltros();
+        }
+
+        function onCheckboxChange() {
+            document.getElementById("dataInicio").value = "";
+            document.getElementById("dataFim").value = "";
+            aplicarFiltros();
+        }
+
+        function toggleAll(tipo, isChecked) {
+            const checkboxes = document.querySelectorAll(`.filtro-${tipo}`);
+            checkboxes.forEach(cb => cb.checked = isChecked);
+            document.getElementById("dataInicio").value = "";
+            document.getElementById("dataFim").value = "";
+            aplicarFiltros();
+        }
+
+        function limparFiltros() {
+            document.getElementById("filtroMacrogrupo").value = "";
+            document.getElementById("filtroGrupo").value = "";
+            document.getElementById("filtroCategoria").value = "";
+            document.getElementById("filtroStatus").value = "";
+            
+            document.querySelectorAll('input[type="checkbox"]').forEach(cb => cb.checked = false);
+            
+            configurarSemanaAtual(new Date());
+            aplicarFiltros();
+        }
+
         async function carregarDadosDaNuvem() {
             try {
-                const cacheBuster = `&t=${new Date().getTime()}`;
-
-                // Faz a requisição para os dois links simultaneamente para ser mais rápido
-                const [respDespesas, respSaldos] = await Promise.all([
-                    fetch(LINK_DESPESAS + cacheBuster).catch(() => null),
-                    fetch(LINK_SALDOS + cacheBuster).catch(() => null)
+                const cb = `&t=${new Date().getTime()}`;
+                const [rDesp, rSal, rRec] = await Promise.all([
+                    fetch(LINK_DESPESAS + cb).then(r => r.text()),
+                    fetch(LINK_SALDOS + cb).then(r => r.text()).catch(() => ""),
+                    fetch(LINK_RECEITAS + cb).then(r => r.text()).catch(() => "")
                 ]);
 
-                if (respDespesas) {
-                    despesasDB = converterCsvParaJson(await respDespesas.text());
-                }
+                despesasDB = converterCsvParaJson(rDesp);
+                receitasDB = converterCsvParaJson(rRec);
+                
+                const saldosData = converterCsvParaJson(rSal);
+                saldosDB = { caixa: 0, banco: 0 };
+                saldosData.forEach(s => {
+                    const nomeConta = (s.conta || "").toLowerCase();
+                    if (nomeConta.includes('caixa')) saldosDB.caixa = s.saldo;
+                    if (nomeConta.includes('banco')) saldosDB.banco = s.saldo;
+                });
 
-                if (respSaldos) {
-                    const saldosCSV = converterCsvParaJson(await respSaldos.text());
-                    // Mapeia o resultado para o nosso banco de saldos
-                    saldosDB = { caixa: 0, banco: 0 };
-                    saldosCSV.forEach(item => {
-                        const nomeConta = (item.conta || "").toLowerCase();
-                        const valor = parseFloat(item.saldo) || 0;
-                        if (nomeConta.includes("caixa")) saldosDB.caixa += valor;
-                        if (nomeConta.includes("banco")) saldosDB.banco += valor;
-                    });
-                }
-
+                popularFiltrosDinamicos();
                 aplicarFiltros();
-            } catch (erro) {
-                console.error("Erro geral de carregamento:", erro);
-            }
+            } catch (e) { console.error(e); }
         }
 
         function converterCsvParaJson(csv) {
+            if (!csv) return [];
             const linhas = csv.split('\n');
-            const resultado = [];
-            if (!linhas || linhas.length < 2) return resultado;
             const cabecalhos = linhas[0].split(',').map(h => h.trim().toLowerCase().replace(/"/g, ''));
-
-            for (let i = 1; i < linhas.length; i++) {
-                if (!linhas[i] || linhas[i].trim() === "") continue;
-                const colunas = linhas[i].split(',').map(c => c.trim().replace(/"/g, ''));
-                const obj = {};
-                cabecalhos.forEach((header, index) => {
-                    let valor = colunas[index];
-                    if (header === 'valor' || header === 'saldo') valor = parseFloat(valor) || 0;
-                    obj[header] = valor;
+            return linhas.slice(1).filter(l => l.trim() !== "").map(linha => {
+                const cols = linha.split(',').map(c => c.trim().replace(/"/g, ''));
+                let obj = {};
+                cabecalhos.forEach((h, i) => {
+                    obj[h] = (h === 'valor' || h === 'saldo') ? parseFloat(cols[i]) || 0 : cols[i];
                 });
-                resultado.push(obj);
-            }
-            return resultado;
+                return obj;
+            });
+        }
+
+        function popularFiltrosDinamicos() {
+            const macros = [...new Set(despesasDB.map(d => d.macrogrupo))].filter(Boolean);
+            const grupos = [...new Set(despesasDB.map(d => d.grupo))].filter(Boolean);
+            const categorias = [...new Set(despesasDB.map(d => d.categoria))].filter(Boolean);
+
+            const selectMacro = document.getElementById('filtroMacrogrupo');
+            selectMacro.innerHTML = '<option value="">Macrogrupo: Todos</option>';
+            macros.sort().forEach(m => selectMacro.innerHTML += `<option value="${m}">${m}</option>`);
+
+            const selectGrupo = document.getElementById('filtroGrupo');
+            selectGrupo.innerHTML = '<option value="">Grupo: Todos</option>';
+            grupos.sort().forEach(g => selectGrupo.innerHTML += `<option value="${g}">${g}</option>`);
+
+            const selectCat = document.getElementById('filtroCategoria');
+            selectCat.innerHTML = '<option value="">Categoria: Todas</option>';
+            categorias.sort().forEach(c => selectCat.innerHTML += `<option value="${c}">${c}</option>`);
         }
 
         function aplicarFiltros() {
             const dtInicio = document.getElementById("dataInicio").value;
             const dtFim = document.getElementById("dataFim").value;
-            const anoSel = document.getElementById("filtroAno").value;
-            const mesSel = document.getElementById("filtroMes").value;
-            const tipoSel = document.getElementById("filtroTipo").value;
-            const statusSel = document.getElementById("filtroStatus").value;
+            const macro = document.getElementById("filtroMacrogrupo").value;
+            const grupo = document.getElementById("filtroGrupo").value;
+            const categoria = document.getElementById("filtroCategoria").value;
+            const status = document.getElementById("filtroStatus").value;
+            
+            const mesesSel = Array.from(document.querySelectorAll('.filtro-mes:checked')).map(i => i.value);
+            const anosSel = Array.from(document.querySelectorAll('.filtro-ano:checked')).map(i => i.value);
 
-            let despesasFiltradas = despesasDB.filter(despesa => {
-                if (!despesa.data) return false;
-                const [anoD, mesD] = despesa.data.split('-');
-
-                let passaCalendario = (!dtInicio || despesa.data >= dtInicio) && (!dtFim || despesa.data <= dtFim);
-                let passaAno = (anoSel === "" || anoD === anoSel);
-                let passaMes = (mesSel === "" || mesD === mesSel);
-                let passaTipo = (tipoSel === "" || despesa.tipo === tipoSel);
-                let passaStatus = (statusSel === "" || despesa.status === statusSel);
-
-                return passaCalendario && passaAno && passaMes && passaTipo && passaStatus;
+            let filtradas = despesasDB.filter(d => {
+                if (!d.data) return false;
+                const [ano, mes] = d.data.split('-');
+                
+                let pCalendario = (!dtInicio || d.data >= dtInicio) && (!dtFim || d.data <= dtFim);
+                let pAno = anosSel.length === 0 || anosSel.includes(ano);
+                let pMes = mesesSel.length === 0 || mesesSel.includes(mes);
+                let pMacro = !macro || d.macrogrupo === macro;
+                let pGrupo = !grupo || d.grupo === grupo;
+                let pCategoria = !categoria || d.categoria === categoria;
+                let pStatus = !status || d.status === status;
+                
+                return pCalendario && pAno && pMes && pMacro && pGrupo && pCategoria && pStatus;
             });
 
-            renderizarCards(despesasFiltradas);
-            calcularFinanceiro(despesasFiltradas);
-            atualizarGrafico(despesasFiltradas);
+            let recFiltradas = receitasDB.filter(r => {
+                if (!r.data) return false;
+                const [ano, mes] = r.data.split('-');
+                let pCalendario = (!dtInicio || r.data >= dtInicio) && (!dtFim || r.data <= dtFim);
+                let pAno = anosSel.length === 0 || anosSel.includes(ano);
+                let pMes = mesesSel.length === 0 || mesesSel.includes(mes);
+                return pCalendario && pAno && pMes;
+            });
+
+            renderizarCards(filtradas);
+            calcularFinanceiro(filtradas, recFiltradas);
+            atualizarGraficoRosca(filtradas);
+            atualizarGraficoBarras(filtradas, recFiltradas); // Chama o novo gráfico
         }
 
-        function calcularFinanceiro(despesas) {
-            // Conta apenas as despesas que não estão pagas para a projeção de saída
-            const totalDespAbertas = despesas.reduce((s, d) => (d.status !== 'Pago') ? s + d.valor : s, 0);
+        function calcularFinanceiro(desp, rec) {
+            const totalDespAberto = desp.reduce((s, d) => d.status !== 'Pago' ? s + d.valor : s, 0);
+            const totalRec = rec.reduce((s, r) => s + r.valor, 0);
+            const disp = saldosDB.caixa + saldosDB.banco;
+            const projecao = disp + totalRec - totalDespAberto;
 
-            const dispTotal = saldosDB.caixa + saldosDB.banco;
-
-            // Projeção = O que tem hoje - O que falta pagar no período selecionado
-            const projecao = dispTotal - totalDespAbertas;
-
-            // Atualiza a interface
-            document.getElementById("despesasPeriodo").innerText = formatarMoeda(totalDespAbertas);
             document.getElementById("saldoCaixa").innerText = formatarMoeda(saldosDB.caixa);
             document.getElementById("saldoBanco").innerText = formatarMoeda(saldosDB.banco);
-            document.getElementById("disponibilidadeTotal").innerText = formatarMoeda(dispTotal);
+            document.getElementById("disponibilidadeTotal").innerText = formatarMoeda(disp);
+            document.getElementById("receitasPeriodo").innerText = formatarMoeda(totalRec);
+            document.getElementById("despesasPeriodo").innerText = formatarMoeda(totalDespAberto);
             document.getElementById("projecaoFinal").innerText = formatarMoeda(projecao);
-
-            // Feedback visual de risco (Vermelho se faltar dinheiro)
-            const cardProj = document.getElementById("cardProjecao");
-            cardProj.style.borderLeft = projecao < 0 ? "4px solid #ff4d4d" : "4px solid #22c1a6";
+            
+            document.getElementById("cardProjecao").style.borderLeft = projecao < 0 ? "4px solid #ff4d4d" : "4px solid #22c1a6";
             document.getElementById("projecaoFinal").style.color = projecao < 0 ? "#ff4d4d" : "#fff";
         }
 
-        function atualizarGrafico(lista) {
+        function atualizarGraficoRosca(lista) {
             const ctx = document.getElementById('graficoCategorias').getContext('2d');
-            const totais = lista.reduce((acc, item) => {
-                acc[item.tipo] = (acc[item.tipo] || 0) + item.valor;
-                return acc;
+            const totais = lista.reduce((acc, d) => { 
+                const chave = d.grupo || 'Outros';
+                acc[chave] = (acc[chave] || 0) + d.valor; 
+                return acc; 
             }, {});
-
             const totalSoma = Object.values(totais).reduce((a, b) => a + b, 0);
-            if (meuGrafico) meuGrafico.destroy();
 
+            if (meuGrafico) meuGrafico.destroy();
             meuGrafico = new Chart(ctx, {
                 type: 'doughnut',
                 plugins: [ChartDataLabels],
                 data: {
-                    labels: ['Fixo', 'Variável', 'Imposto', 'Sarima'],
+                    labels: Object.keys(totais),
                     datasets: [{
-                        data: [totais.fixo || 0, totais.variavel || 0, totais.imposto || 0, totais.sarima || 0],
-                        backgroundColor: ['#E1C158', '#A67C00', '#444444', 'gray'],
+                        data: Object.values(totais),
+                        backgroundColor: ['#E1C158', '#A67C00', '#444444', '#1A73E8', '#E8710A', '#8AB4F8'],
                         borderColor: '#141414',
                         borderWidth: 4
                     }]
@@ -308,10 +345,15 @@
                     responsive: true,
                     plugins: {
                         legend: { position: 'bottom', labels: { color: '#fff' } },
-                        title: { display: true, text: 'DISTRIBUIÇÃO PERCENTUAL', color: '#E1C158', font: { size: 16, weight: 'bold' } },
-                        datalabels: {
-                            color: '#fff',
-                            formatter: (val) => (!val || totalSoma === 0) ? null : ((val / totalSoma) * 100).toFixed(1) + "%"
+                        datalabels: { 
+                            color: '#fff', 
+                            font: { weight: 'bold', size: 12 },
+                            formatter: (v) => {
+                                if (!v || totalSoma === 0) return null;
+                                let perc = (v / totalSoma) * 100;
+                                if (perc < 4) return null; 
+                                return perc.toFixed(1) + "%";
+                            }
                         }
                     },
                     cutout: '60%'
@@ -319,27 +361,87 @@
             });
         }
 
-        function formatarMoeda(v) { return v.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' }); }
+        function atualizarGraficoBarras(despesas, receitas) {
+            const ctx = document.getElementById('graficoEvolucao').getContext('2d');
+            
+            const mesesLabels = ['Jan', 'Fev', 'Mar', 'Abr', 'Mai', 'Jun', 'Jul', 'Ago', 'Set', 'Out', 'Nov', 'Dez'];
+            let dadosReceitas = new Array(12).fill(0);
+            let dadosDespesas = new Array(12).fill(0);
 
+            despesas.forEach(d => {
+                if(d.data) {
+                    const mes = parseInt(d.data.split('-')[1]) - 1;
+                    dadosDespesas[mes] += d.valor;
+                }
+            });
+
+            receitas.forEach(r => {
+                if(r.data) {
+                    const mes = parseInt(r.data.split('-')[1]) - 1;
+                    dadosReceitas[mes] += r.valor;
+                }
+            });
+
+            if (graficoBarras) graficoBarras.destroy();
+
+            graficoBarras = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: mesesLabels,
+                    datasets: [
+                        {
+                            label: 'Receitas',
+                            data: dadosReceitas,
+                            backgroundColor: '#22c1a6',
+                            borderRadius: 5
+                        },
+                        {
+                            label: 'Despesas',
+                            data: dadosDespesas,
+                            backgroundColor: '#ff4d4d',
+                            borderRadius: 5
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    plugins: {
+                        legend: { labels: { color: '#fff' } },
+                        title: { display: true, text: 'RECEITAS VS DESPESAS', color: '#E1C158', font: { size: 16, weight: 'bold' } },
+                        datalabels: { display: false } 
+                    },
+                    scales: {
+                        y: { ticks: { color: '#888' }, grid: { color: '#333' } },
+                        x: { ticks: { color: '#888' }, grid: { display: false } }
+                    }
+                }
+            });
+        }
+
+        function formatarMoeda(v) { return v.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' }); }
+        
         function renderizarCards(lista) {
             const container = document.getElementById("listaDespesas");
-            container.innerHTML = lista.length === 0 ? "<p style='color:#888;text-align:center;padding:20px;'>Nenhuma despesa para este filtro.</p>" : "";
-            lista.forEach(item => {
-                let corStatus = item.status === 'Pago' ? '#22c1a6' : (item.status === 'Atrasado' ? '#ff4d4d' : '#FFDF73');
+            container.innerHTML = lista.length ? "" : "<p style='color:#888;text-align:center;padding:20px;'>Nenhuma despesa localizada.</p>";
+            
+            lista.sort((a, b) => new Date(a.data) - new Date(b.data));
+
+            lista.forEach(d => {
+                let cor = d.status === 'Pago' ? '#22c1a6' : (d.status === 'Atrasado' ? '#ff4d4d' : '#FFDF73');
+
                 container.innerHTML += `
                     <div class="expense-card">
                         <div class="expense-info">
-                            <h4>${item.descricao}</h4>
-                            <p>${item.data.split('-').reverse().join('/')} • ${item.tipo}</p>
+                            <h4>${d.descricao}</h4>
+                            <p style="font-size: 0.7rem; color: #888; margin-top: 3px;">${d.data.split('-').reverse().join('/')} • ${d.macrogrupo || 'N/A'} > ${d.grupo || 'N/A'} > ${d.categoria || 'N/A'}</p>
                         </div>
                         <div class="expense-value">
-                            <span class="price">${formatarMoeda(item.valor)}</span>
-                            <span class="status" style="background:${corStatus}; color:#111; font-weight:bold;">${item.status}</span>
+                            <span class="price">${formatarMoeda(d.valor)}</span>
+                            <span class="status" style="background:${cor}; color:#111; font-weight:bold;">${d.status}</span>
                         </div>
                     </div>`;
             });
         }
     </script>
 </body>
-
 </html>
